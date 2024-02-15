@@ -1,5 +1,5 @@
-#ifndef __realtime_task_h__
-#define __realtime_task_h__
+#ifndef __irsl_realtime_task_h__
+#define __irsl_realtime_task_h__
 
 #include <stdexcept> // c++11
 #include <math.h>
@@ -24,7 +24,7 @@
 #define REALTIME_PRIO_MIN 1
 // milsec(-3)/usec(-6)/nano(-9)/pico(-12)
 
-namespace realtime_task
+namespace irsl_realtime_task
 {
 
 
@@ -58,8 +58,8 @@ public:
         clock_gettime( CLOCK_MONOTONIC, &now_t );
 
         const double measured_interval_u = ( (now_t.tv_sec - m_t.tv_sec)*NSEC_PER_SEC + (now_t.tv_nsec - m_t.tv_nsec) )/1000.0;
-        if (measured_interval_u > max_interval_u) max_interval_u = measured_interval;
-        if (measured_interval_u < min_interval_u) min_interval_u = measured_interval;
+        if (measured_interval_u > max_interval_u) max_interval_u = measured_interval_u;
+        if (measured_interval_u < min_interval_u) min_interval_u = measured_interval_u;
         // 前フレームの時刻として保存
         m_t.tv_sec  = now_t.tv_sec;
         m_t.tv_nsec = now_t.tv_nsec;
@@ -82,17 +82,17 @@ public:
     double getTimeUsec()
     {
         timespec now_t;
-        clock_gettime( CLOCK_MONOTONIC, &new_t );
-        double measured_interval_usec = ( (new_t.tv_sec - m_t.tv_sec)*NSEC_PER_SEC + (new_t.tv_nsec - m_t.tv_nsec) )/1000.0;
+        clock_gettime( CLOCK_MONOTONIC, &now_t );
+        double measured_interval_usec = ( (now_t.tv_sec - m_t.tv_sec)*NSEC_PER_SEC + (now_t.tv_nsec - m_t.tv_nsec) )/1000.0;
 
         return measured_interval_usec;
     }
     long getTimeNsec()
     {
-        timespec new_t;
-        clock_gettime( CLOCK_MONOTONIC, &new_t );
-        long measured_interval_nsec = (new_t.tv_nsec - m_t.tv_nsec);
-        measured_interval_nsec += (new_t.tv_sec - m_t.tv_sec)*NSEC_PER_SEC;
+        timespec now_t;
+        clock_gettime( CLOCK_MONOTONIC, &now_t );
+        long measured_interval_nsec = (now_t.tv_nsec - m_t.tv_nsec);
+        measured_interval_nsec += (now_t.tv_sec - m_t.tv_sec)*NSEC_PER_SEC;
         return measured_interval_nsec;
     }
     void reset() // reset statistics
@@ -133,7 +133,7 @@ class RealtimeContext {
     const int m_interval_n; // n_sec
     timespec m_t;
     void _increment_t(){
-        m_t.tv_nsec += m_interval_u;
+        m_t.tv_nsec += m_interval_n;
         while( m_t.tv_nsec >= NSEC_PER_SEC ){
             m_t.tv_nsec -= NSEC_PER_SEC;
             m_t.tv_sec++;
