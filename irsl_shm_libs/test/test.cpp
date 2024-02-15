@@ -1,4 +1,4 @@
-#include "irsl/irsl_shm_controller.h"
+#include "irsl/shm_controller.h"
 
 #include <iostream>
 

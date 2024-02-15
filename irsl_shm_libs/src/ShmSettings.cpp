@@ -1,4 +1,4 @@
-#include "irsl/irsl_shm_controller.h"
+#include "irsl/shm_controller.h"
 
 using namespace irsl_shm_controller;
 
@@ -65,7 +65,7 @@ uint64_t ShmSettings::calcTotalSize()
     return size;
 }
 
-//// getOffset defined in ShmSettings/irsl_shm_controller.h
+//// getOffset defined in ShmSettings/shm_controller.h
 int ShmSettings::getOffsetData()
 {
     return sizeof(ShmDataHeader);
