@@ -54,6 +54,21 @@ void ShmSettings::setHeaderData(std::vector<uint8_t> &data)
     *p_isize = numImuSensors;
 }
 
+bool ShmSettings::equal(const ShmSettings &settings)
+{
+    if (hash == settings.hash &&
+        numJoints == settings.numJoints &&
+        numForceSensors == settings.numForceSensors &&
+        numImuSensors == settings.numImuSensors &&
+        totalSize == settings.totalSize &&
+        extraDataSize == settings.extraDataSize &&
+        jointType == settings.jointType )
+    {
+        return true;
+    }
+    return false;
+}
+
 uint64_t ShmSettings::calcTotalSize()
 {
     uint64_t size = sizeof(ShmDataHeader);

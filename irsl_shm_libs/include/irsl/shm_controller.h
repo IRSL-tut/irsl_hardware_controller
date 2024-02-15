@@ -67,6 +67,7 @@ struct ShmSettings {
     uint64_t calcTotalSize();
     uint64_t getSizeOfSingleJointData();
     void setHeaderData(std::vector<uint8_t> &data);
+    bool equal(const ShmSettings &settings);
 
     ////
     def_offset_method(Data);
@@ -102,8 +103,9 @@ struct ShmDataHeader {
     int getExtraDataSize();
     int getNumJoints();
     uint16_t getJointType();
-    int getNumForceSensor();
-    int getNumImuSensor();
+    int getNumForceSensors();
+    int getNumImuSensors();
+    void writeSettings(ShmSettings &result);
 };
 
 #define define_read_write_method(fname,vartype)         \
@@ -119,7 +121,7 @@ public:
 
 public:
     bool readSettings(const std::string &fname);
-    bool openSharedMemory();
+    bool openSharedMemory(bool create = false, uint16_t permission = 0666);
 
     bool hasSettings();
     const ShmSettings &settings();
@@ -127,12 +129,16 @@ public:
     bool isOpen();
 
     bool writeHeader();
+    bool checkHeader();
+    bool readFromHeader(ShmSettings &settings);
 
     bool setFrame(uint64_t _frame);
     uint64_t getFrame();
     uint64_t resetFrame();
     uint64_t incrementFrame();
 
+    bool getTime(int32_t &sec, int32_t &nsec);
+    bool setTime(const int32_t sec, const int32_t nsec);
     ////
     define_read_write_method(Status,uint64_t);
     define_read_write_method(PositionCurrent,irsl_float_type);
@@ -170,7 +176,7 @@ private:
 #undef define_read_write_method
 
 //
-void *open_shared_memory(const uint32_t _key, const uint64_t _size, int &shm_id);
+void *open_shared_memory(const uint32_t _key, const uint64_t _size, int &shm_id, bool create = true, uint16_t permission = 0666);
 
 }
 

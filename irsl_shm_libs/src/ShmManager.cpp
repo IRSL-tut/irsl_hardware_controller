@@ -34,20 +34,18 @@ bool ShmManager::readSettings(const std::string &fname)
 {
     return true;
 }
-bool ShmManager::openSharedMemory()
+bool ShmManager::openSharedMemory(bool create, uint16_t permission)
 {
     if(hasSettings() && impl->current_settings.totalSize > 0) {
-        void *res = open_shared_memory(impl->current_settings.shm_key, impl->current_settings.totalSize, impl->shm_id);
+        void *res = open_shared_memory(impl->current_settings.shm_key, impl->current_settings.totalSize,
+                                       impl->shm_id, create, permission);
         if (!!res) {
-            std::cout << "ptr: " << res << std::endl;
             impl->setPointer(res);
         } else {
-            std::cout << "err: " << res <<  std::endl;
             return false;
         }
         return true;
     }
-    std::cout << "err l: " << std::endl;
     // TODO: check result
     return false;
 }
@@ -65,6 +63,9 @@ const ShmSettings &ShmManager::settings()
 void ShmManager::setSettings(const ShmSettings &settings)
 {
     impl->current_settings = settings;
+    if (impl->current_settings.totalSize <= 0) {
+        impl->current_settings.calcTotalSize();
+    }
 }
 bool ShmManager::isOpen()
 {
@@ -74,6 +75,23 @@ bool ShmManager::isOpen()
 bool ShmManager::writeHeader()
 {
     return impl->writeHeader(impl->current_settings);
+}
+bool ShmManager::checkHeader()
+{
+    ShmSettings hdr_settings;
+    bool res = readFromHeader(hdr_settings);
+    if (!res) return false;
+    bool update = hdr_settings.equal(impl->current_settings);
+    if (!update) return false;
+    impl->updateBySettings(impl->current_settings);
+    return true;
+}
+bool ShmManager::readFromHeader(ShmSettings &settings)
+{
+    ShmDataHeader *hdr = getHeader();
+    if (!hdr) return false;
+    hdr->writeSettings(settings);
+    return true;
 }
 //
 bool ShmManager::setFrame(uint64_t _frame)
@@ -91,6 +109,23 @@ uint64_t ShmManager::resetFrame()
 uint64_t ShmManager::incrementFrame()
 {
     return impl->incrementFrame();
+}
+//
+bool ShmManager::getTime(int32_t &sec, int32_t &nsec)
+{
+    if (!(impl->ptr)) return false;
+    ShmDataHeader *pp = (ShmDataHeader *)impl->ptr;
+    sec  = pp->sec;
+    nsec = pp->nsec;
+    return true;
+}
+bool ShmManager::setTime(const int32_t sec, const int32_t nsec)
+{
+    if (!(impl->ptr)) return false;
+    ShmDataHeader *pp = (ShmDataHeader *)impl->ptr;
+    pp->sec  = sec;
+    pp->nsec = nsec;
+    return true;
 }
 
 #define define_read_write_method(fname,vartype)          \

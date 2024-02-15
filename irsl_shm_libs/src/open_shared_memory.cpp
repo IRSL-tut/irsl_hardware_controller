@@ -11,13 +11,15 @@
 namespace irsl_shm_controller
 {
 
-void *open_shared_memory(const uint32_t _key, const uint64_t _size, int &shm_id)
+void *open_shared_memory(const uint32_t _key, const uint64_t _size, int &shm_id, bool create, uint16_t permission)
 {
     void *ptr;
     int err;
-    //
-    //shm_id = shmget(_key, _size, IPC_CREAT);
-    shm_id = shmget(_key, _size, IPC_CREAT | 0777); // add permission???
+    if (create) {
+        shm_id = shmget(_key, _size, IPC_CREAT | permission); // add permission???
+    } else {
+        shm_id = shmget(_key, _size, 0); // just use existing shared-memory
+    }
     if(shm_id == -1) {
         err = errno;
         std::cerr << "shmget failed, key=" << _key;
