@@ -27,13 +27,24 @@ uint16_t ShmDataHeader::getJointType()
     uint16_t *res = (uint16_t *)((void *)header + 18);
     return *res;
 }
-int ShmDataHeader::getNumForceSensor()
+int ShmDataHeader::getNumForceSensors()
 {
     uint8_t *res = (uint8_t *)((void *)header + 20);
     return *res;
 }
-int ShmDataHeader::getNumImuSensor()
+int ShmDataHeader::getNumImuSensors()
 {
     uint8_t *res = (uint8_t *)((void *)header + 21);
     return *res;
+}
+void ShmDataHeader::writeSettings(ShmSettings &result)
+{
+    result.hash = getHash();
+    result.numJoints = getNumJoints();
+    result.numForceSensors = getNumForceSensors();
+    result.numImuSensors = getNumImuSensors();
+
+    result.totalSize = getTotalSize();
+    result.extraDataSize = getExtraDataSize();
+    result.jointType = getJointType();
 }

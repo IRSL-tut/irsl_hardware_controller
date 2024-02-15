@@ -146,7 +146,7 @@ struct ShmData {
         return *frame_ptr;
     }
 
-    inline bool writeHeader(ShmSettings &settings)
+    inline void updateBySettings(ShmSettings &settings)
     {
         initialized = true;
 
@@ -169,7 +169,11 @@ struct ShmData {
         set_offset_func(ForceSensor);
         set_offset_func(ImuSensor);
         set_offset_func(ExtraData);
+    }
 
+    inline bool writeHeader(ShmSettings &settings)
+    {
+        updateBySettings(settings);
         if (!!ptr) {
             std::vector<uint8_t> data;
             settings.setHeaderData(data);
