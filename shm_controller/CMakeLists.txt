@@ -20,7 +20,7 @@ if(USE_DOUBLE_PRECISION)
 endif()
 
 set(irsl_public_headers
-  include/irsl/irsl_shm_controller.h
+  include/irsl/shm_controller.h
 )
 set_target_properties(${targetname} PROPERTIES
   PUBLIC_HEADER "${irsl_public_headers}"

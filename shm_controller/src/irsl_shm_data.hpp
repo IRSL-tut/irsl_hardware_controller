@@ -1,7 +1,7 @@
 #ifndef __IRSL_SHM_DATA__
 #define __IRSL_SHM_DATA__
 
-#include "irsl/irsl_shm_controller.h"
+#include "irsl/shm_controller.h"
 
 namespace irsl_shm_controller
 {
@@ -150,7 +150,7 @@ struct ShmData {
     {
         initialized = true;
 
-        // add same name of def_offset_method in ShmSettings/irsl_shm_controller.h
+        // add same name of def_offset_method in ShmSettings/shm_controller.h
         set_offset_func(Data);
         set_offset_func(Status);
         set_offset_func(PositionCurrent);
