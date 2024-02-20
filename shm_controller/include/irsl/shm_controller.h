@@ -121,7 +121,7 @@ public:
 
 public:
     bool readSettings(const std::string &fname);
-    bool openSharedMemory(bool create = false, uint16_t permission = 0666);
+    bool openSharedMemory(bool create = true, uint16_t permission = 0777);
 
     bool hasSettings();
     const ShmSettings &settings();
@@ -176,7 +176,7 @@ private:
 #undef define_read_write_method
 
 //
-void *open_shared_memory(const uint32_t _key, const uint64_t _size, int &shm_id, bool create = true, uint16_t permission = 0666);
+void *open_shared_memory(const uint32_t _key, const uint64_t _size, int &shm_id, bool create = true, uint16_t permission = 0777);
 
 }
 
