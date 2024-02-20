@@ -1,0 +1,15 @@
+int: 31
+double: 1.6
+bool: false
+string: hoge
+listint: [0, 2, 3]
+listdouble: [1.1, 2.2, 3.3]
+liststring: ['hoge', 'moge', 'fuga']
+hoge: { valueint: 44, valuedbl: 3.1, valuestr: "o16" }
+mapint: {a: 11, b: 22, c: 33}
+mapdouble: {d: 0.7, e: 0.6, f: 0.5}
+mapstring: {aa: 'xxx', bb: 'yyy', cc: 'zzz'}
+structlist:
+  - { valueint: 12, valuedbl: 1.1, valuestr: "aa" }
+  - { valueint: 24, valuedbl: 2.1, valuestr: "bb" }
+  - { valueint: 36, valuedbl: 4.1, valuestr: "cc" }
