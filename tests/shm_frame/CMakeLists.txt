@@ -23,3 +23,5 @@ add_executable(test_client test_client.cpp)
 # include_directories(
 target_link_libraries(test_host   irsl_shm_controller)
 target_link_libraries(test_client irsl_shm_controller)
+###target_link_libraries(test_host   irsl_shm_controller irsl_reamtime_utils)
+###target_link_libraries(test_client irsl_shm_controller irsl_reamtime_utils)
