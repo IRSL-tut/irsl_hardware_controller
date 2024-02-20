@@ -15,7 +15,7 @@ int main(int argc, char **argv)
     ss.numForceSensors = 1;
     ss.numImuSensors   = 1;
     ss.hash = 8888;
-    ss.shm_key = 8888;
+    ss.shm_key = 8889;
     //ss.extraDataSize = 0;
     //ss.extraDataSize = 96;
     // ss.jointType =
@@ -29,7 +29,7 @@ int main(int argc, char **argv)
     ShmManager sm(ss);
 
     bool res;
-    res = sm.openSharedMemory();
+    res = sm.openSharedMemory(true);
     std::cout << "open: " << res << std::endl;
 
     res = sm.writeHeader();
@@ -37,6 +37,7 @@ int main(int argc, char **argv)
 
     std::cout << "isOpen: " << sm.isOpen() << std::endl;
 
+    sm.resetFrame();
     IntervalStatistics tm(10000);
 
     int cntr = 0;

@@ -15,7 +15,7 @@ int main(int argc, char **argv)
     ss.numForceSensors = 1;
     ss.numImuSensors   = 1;
     ss.hash = 8888;
-    ss.shm_key = 8888;
+    ss.shm_key = 8889;
     //ss.extraDataSize = 0;
     //ss.extraDataSize = 96;
     // ss.jointType =
