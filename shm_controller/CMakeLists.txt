@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.0.0)
 
-project(irsl_shm_controller)
+project(irsl_shm_controller
+  VERSION 0.0.1
+  LANGUAGES CXX
+)
 
 option(USE_DOUBLE_PRECISION "Using double for floating point variables" ON)
 
@@ -34,9 +37,17 @@ install(TARGETS ${targetname}
 )
 
 install(EXPORT irsl-hw-con-export
-  FILE ${targetname}-config.cmake
-  DESTINATION share/${targetname}/cmake ## share/irsl
+  FILE ${targetname}Config.cmake
+  DESTINATION lib/cmake/${targetname}
   EXPORT_LINK_INTERFACE_LIBRARIES
 )
 
-## TODO version
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+  "${PROJECT_BINARY_DIR}/${targetname}ConfigVersion.cmake"
+  # VERSION 1.0.1
+  COMPATIBILITY AnyNewerVersion
+)
+install(FILES "${PROJECT_BINARY_DIR}/${targetname}ConfigVersion.cmake"
+  DESTINATION lib/cmake/${targetname}
+)
