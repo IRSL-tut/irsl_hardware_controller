@@ -21,6 +21,7 @@ void *open_shared_memory(const uint32_t _key, const uint64_t _size, int &shm_id,
         shm_id = shmget(_key, _size, 0); // just use existing shared-memory
     }
     if(shm_id == -1) {
+        perror("shmget ");
         err = errno;
         std::cerr << "shmget failed, key=" << _key;
         std::cerr << ", size=" << _size;
@@ -30,6 +31,7 @@ void *open_shared_memory(const uint32_t _key, const uint64_t _size, int &shm_id,
     ///
     ptr = (void *)shmat(shm_id, (void *)0, 0);
     if(ptr == (void *)-1) {
+        perror("shmat ");
         err = errno;
         std::cerr << "shmat failed, key=" << _key;
         std::cerr << ", size=" << _size;
