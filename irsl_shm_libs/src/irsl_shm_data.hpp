@@ -169,6 +169,12 @@ struct ShmData {
         set_offset_func(ForceSensor);
         set_offset_func(ImuSensor);
         set_offset_func(ExtraData);
+
+        // copy size
+        joint_size = settings.numJoints;
+        force_size = settings.numForceSensors;
+        imu_size   = settings.numImuSensors;
+        extra_size = settings.extraDataSize;
     }
 
     inline bool writeHeader(ShmSettings &settings)
@@ -208,7 +214,7 @@ struct ShmData {
 
     inline bool readForceSensor(int id, std::vector<irsl_float_type> &res)
     {
-        //TODO: size-check
+        //TODO: size-check / id check
         if (res.size() != SIZE_OF_FORCE_SENSOR) {
             res.resize(SIZE_OF_FORCE_SENSOR);
         }
@@ -220,7 +226,7 @@ struct ShmData {
     }
     inline bool writeForceSensor(int id, const std::vector<irsl_float_type> &res)
     {
-        //TODO: size-check
+        //TODO: size-check / id check
         int num = res.size() > SIZE_OF_FORCE_SENSOR ? SIZE_OF_FORCE_SENSOR : res.size();
         irsl_float_type *cur_ptr = (irsl_float_type *)(ptr + offset_ForceSensor + id * sizeof(irsl_float_type) * SIZE_OF_FORCE_SENSOR);
         for(int i = 0; i < num; i++) {
@@ -230,7 +236,7 @@ struct ShmData {
     }
     inline bool readImuSensor(int id, std::vector<irsl_float_type> &res)
     {
-        //TODO: size-check
+        //TODO: size-check / id check
         if (res.size() != SIZE_OF_IMU_SENSOR) {
             res.resize(SIZE_OF_IMU_SENSOR);
         }
@@ -242,7 +248,7 @@ struct ShmData {
     }
     inline bool writeImuSensor(int id, const std::vector<irsl_float_type> &res)
     {
-        //TODO: size-check
+        //TODO: size-check / id check
         int num = res.size() > SIZE_OF_IMU_SENSOR ? SIZE_OF_IMU_SENSOR : res.size();
         irsl_float_type *cur_ptr = (irsl_float_type *)(ptr + offset_ImuSensor + id * sizeof(irsl_float_type) * SIZE_OF_IMU_SENSOR);
         for(int i = 0; i < num; i++) {
