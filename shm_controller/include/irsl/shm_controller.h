@@ -20,7 +20,8 @@ typedef double irsl_float_type;
     int getOffset##fname()
 
 struct ShmSettings {
-    ShmSettings() : hash(0) {}
+    ShmSettings() : shm_key(0), hash(0), numJoints(0), numForceSensors(0), numImuSensors(0), totalSize(0), extraDataSize(0), jointType(0)
+    {}
 
     ////
     enum JointType { // 16bit
