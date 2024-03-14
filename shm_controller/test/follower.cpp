@@ -27,14 +27,18 @@ int main(int argc, char **argv)
     ShmManager sm(ss);
 
     bool res;
-    res = sm.openSharedMemory();
+    res = sm.openSharedMemory(false);
     std::cout << "open: " << res << std::endl;
 
-    res = sm.writeHeader();
-    std::cout << "writeHeader: " << res << std::endl;
+    ShmSettings rd_ss;
+    res = sm.readFromHeader(rd_ss);
+    std::cout << "sm.readFromHeader() : " << res << std::endl;
+
+    std::cout << "read data / equal : " << ss.equal(rd_ss) << std::endl;
+
+    std::cout << "checkHeader() : " << sm.checkHeader() << std::endl;
 
     std::cout << "isOpen: " << sm.isOpen() << std::endl;
 
-    // polling
     return 0;
 }

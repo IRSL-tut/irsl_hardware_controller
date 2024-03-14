@@ -16,7 +16,8 @@ int main(int argc, char **argv)
     ss.shm_key = 8888;
     //ss.extraDataSize = 0;
     //ss.extraDataSize = 96;
-    // ss.jointType =
+    ss.jointType = ShmSettings::PositionCommand | ShmSettings::PositionGains;
+
     std::cout << "TotalSize: "  << ss.calcTotalSize() << std::endl;
     std::cout << "SingleSize: " << ss.getSizeOfSingleJointData() << std::endl;
 
