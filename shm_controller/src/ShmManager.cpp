@@ -65,6 +65,7 @@ void ShmManager::setSettings(const ShmSettings &settings)
     impl->current_settings = settings;
     if (impl->current_settings.totalSize <= 0) {
         impl->current_settings.calcTotalSize();
+
     }
 }
 bool ShmManager::isOpen()
@@ -128,7 +129,7 @@ bool ShmManager::setTime(const int32_t sec, const int32_t nsec)
     return true;
 }
 
-#define define_read_write_method(fname,vartype)          \
+#define generate_read_write_method(fname,vartype)          \
 bool ShmManager::read##fname (std::vector<vartype> &res) \
 {                                                        \
     return impl->read##fname(res);                       \
@@ -138,22 +139,22 @@ bool ShmManager::write##fname (const std::vector<vartype> &res) \
     return impl->write##fname(res);                             \
 }
 
-define_read_write_method(Status,uint64_t);
-define_read_write_method(PositionCurrent,irsl_float_type);
-define_read_write_method(PositionCurrentAux,irsl_float_type);
-define_read_write_method(PositionCommand,irsl_float_type);
-define_read_write_method(PositionPgain,irsl_float_type);
-define_read_write_method(PositionDgain,irsl_float_type);
+generate_read_write_method(Status,uint64_t);
+generate_read_write_method(PositionCurrent,irsl_float_type);
+generate_read_write_method(PositionCurrentAux,irsl_float_type);
+generate_read_write_method(PositionCommand,irsl_float_type);
+generate_read_write_method(PositionPgain,irsl_float_type);
+generate_read_write_method(PositionDgain,irsl_float_type);
 //
-define_read_write_method(VelocityCurrent,irsl_float_type);
-define_read_write_method(VelocityCommand,irsl_float_type);
-define_read_write_method(VelocityPgain,irsl_float_type);
-define_read_write_method(VelocityDgain,irsl_float_type);
+generate_read_write_method(VelocityCurrent,irsl_float_type);
+generate_read_write_method(VelocityCommand,irsl_float_type);
+generate_read_write_method(VelocityPgain,irsl_float_type);
+generate_read_write_method(VelocityDgain,irsl_float_type);
 //
-define_read_write_method(TorqueCurrent,irsl_float_type);
-define_read_write_method(TorqueCommand,irsl_float_type);
-define_read_write_method(TorquePgain,irsl_float_type);
-define_read_write_method(TorqueDgain,irsl_float_type);
+generate_read_write_method(TorqueCurrent,irsl_float_type);
+generate_read_write_method(TorqueCommand,irsl_float_type);
+generate_read_write_method(TorquePgain,irsl_float_type);
+generate_read_write_method(TorqueDgain,irsl_float_type);
 
 bool ShmManager::readForceSensor(int id, std::vector<irsl_float_type> &res)
 {
