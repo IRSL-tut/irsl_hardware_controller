@@ -9,9 +9,9 @@ int main(int argc, char **argv)
     std::cout << "ShmDataHeader: " << sizeof(ShmDataHeader) << std::endl;
 
     ShmSettings ss;
-    ss.numJoints = 3;
-    ss.numForceSensors = 1;
-    ss.numImuSensors   = 1;
+    ss.numJoints = 18;
+    ss.numForceSensors = 0;
+    ss.numImuSensors   = 0;
     ss.hash    = 8888;
     ss.shm_key = 8888;
     //ss.extraDataSize = 0;
