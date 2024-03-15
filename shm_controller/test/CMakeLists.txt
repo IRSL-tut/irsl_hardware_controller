@@ -26,3 +26,6 @@ target_link_libraries(test irsl_shm_controller)
 target_link_libraries(leader irsl_shm_controller)
 target_link_libraries(follower irsl_shm_controller)
 target_link_libraries(read_shm irsl_shm_controller)
+
+add_library(read_shm_func SHARED read_shm_func.cpp)
+target_link_libraries(read_shm_func irsl_shm_controller)
