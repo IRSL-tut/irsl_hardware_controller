@@ -2,18 +2,25 @@
 
 #include <iostream>
 
+#include <string> // std::stol / stoi / stod xxx
+
 using namespace irsl_shm_controller;
 
 int main(int argc, char **argv)
 {
+    int key = 8888;
+    int num_joints = 18;
+    int num_fsensor = 0;
+    int num_isensor = 0;
+
     std::cout << "ShmDataHeader: " << sizeof(ShmDataHeader) << std::endl;
 
     ShmSettings ss;
-    ss.numJoints = 18;
-    ss.numForceSensors = 0;
-    ss.numImuSensors   = 0;
+    ss.numJoints = num_joints;
+    ss.numForceSensors = num_fsensor;
+    ss.numImuSensors   = num_isensor;
     ss.hash    = 8888;
-    ss.shm_key = 8888;
+    ss.shm_key = key;
     //ss.extraDataSize = 0;
     //ss.extraDataSize = 96;
     ss.jointType = ShmSettings::PositionCommand | ShmSettings::PositionGains;
