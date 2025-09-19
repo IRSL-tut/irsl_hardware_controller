@@ -6,6 +6,7 @@ project(irsl_shm_controller
 )
 
 option(USE_DOUBLE_PRECISION "Using double for floating point variables" ON)
+option(BUILD_PYBIND11 "Build Python bindings with pybind11" ON)
 
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
@@ -51,3 +52,39 @@ write_basic_package_version_file(
 install(FILES "${PROJECT_BINARY_DIR}/${targetname}ConfigVersion.cmake"
   DESTINATION lib/cmake/${targetname}
 )
+
+# ----- Python bindings (pybind11) -----
+# cmake -S /home/irsl/temp/irsl_hardware_controller/shm_controller -B /home/irsl/temp/irsl_hardware_controller/shm_controller/build -DBUILD_PYBIND11=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+if(BUILD_PYBIND11)
+  include(CheckCXXCompilerFlag)
+  # Try to find pybind11 via package config first
+  find_package(pybind11 QUIET CONFIG)
+  if(NOT pybind11_FOUND)
+    message(STATUS "pybind11 not found via find_package; using FetchContent to download it")
+    include(FetchContent)
+    set(FETCHCONTENT_QUIET OFF)
+    FetchContent_Declare(
+      pybind11
+      GIT_REPOSITORY https://github.com/pybind/pybind11.git
+      GIT_TAG v2.12.0
+    )
+    FetchContent_MakeAvailable(pybind11)
+  endif()
+
+  # Build extension module
+  set(pymod_name irsl_shm)
+  pybind11_add_module(${pymod_name} MODULE
+    python/py_irsl_shm.cpp
+  )
+  target_link_libraries(${pymod_name} PRIVATE ${targetname})
+  # Inherit definitions such as IRSL_USE_DOUBLE from top-level options if needed
+  if(USE_DOUBLE_PRECISION)
+    target_compile_definitions(${pymod_name} PRIVATE IRSL_USE_DOUBLE)
+  endif()
+  target_include_directories(${pymod_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
+
+  # Optional: install module to lib directory
+  install(TARGETS ${pymod_name}
+    LIBRARY DESTINATION lib
+  )
+endif()
