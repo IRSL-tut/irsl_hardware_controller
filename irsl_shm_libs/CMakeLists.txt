@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0.0)
 
-project(irsl_shm_controller
+project(irsl_shm_libs
   VERSION 0.0.1
   LANGUAGES CXX
 )
@@ -85,6 +85,6 @@ if(BUILD_PYBIND11)
 
   # Optional: install module to lib directory
   install(TARGETS ${pymod_name}
-    LIBRARY DESTINATION lib
+    LIBRARY DESTINATION share/${targetname}/
   )
 endif()
