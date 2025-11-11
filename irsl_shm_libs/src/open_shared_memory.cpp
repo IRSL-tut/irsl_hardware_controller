@@ -7,6 +7,7 @@
 #include <errno.h>
 
 #include <iostream>
+#include <cstdint>
 
 namespace irsl_shm_controller
 {
@@ -18,7 +19,7 @@ void *open_shared_memory(const uint32_t _key, const uint64_t _size, int &shm_id,
     if (create) {
         shm_id = shmget(_key, _size, IPC_CREAT | permission); // add permission???
     } else {
-        shm_id = shmget(_key, _size, 0); // just use existing shared-memory
+        shm_id = shmget(_key, 0, 0); // just use existing shared-memory
     }
     if(shm_id == -1) {
         perror("shmget ");

@@ -3,14 +3,14 @@
 
 #include <iostream>
 
-using namespace irsl_shm_controller;
-using namespace irsl_realtime_task;
+namespace isc = irsl_shm_controller;
+namespace irt = irsl_realtime_task;
 
 int main(int argc, char **argv)
 {
-    std::cout << "ShmDataHeader: " << sizeof(ShmDataHeader) << std::endl;
+    std::cout << "ShmDataHeader: " << sizeof(isc::ShmDataHeader) << std::endl;
 
-    ShmSettings ss;
+    isc::ShmSettings ss;
     ss.numJoints = 3;
     ss.numForceSensors = 1;
     ss.numImuSensors   = 1;
@@ -26,7 +26,7 @@ int main(int argc, char **argv)
     ss.setHeaderData(data);
 
     ////
-    ShmManager sm(ss);
+    isc::ShmManager sm(ss);
 
     bool res;
     res = sm.openSharedMemory(true);
@@ -38,20 +38,21 @@ int main(int argc, char **argv)
     std::cout << "isOpen: " << sm.isOpen() << std::endl;
 
     sm.resetFrame();
-    IntervalStatistics tm(10000);
-
+    //IntervalStatistics tm(10000);
+    irt::RealtimeContext rt(0, 1000000, false);
     int cntr = 0;
-    tm.start();
+    rt.start();
     while(true) {
-        tm.sleepUntil(10000000);
-        tm.sync();
         cntr++;
         sm.incrementFrame();
-        if (cntr > 100) {
-            std::cout << "max: " << tm.getMaxInterval() << std::endl;
-            tm.reset();
+        if (cntr > 1000) {
+            //std::cout << "max: " << tm.getMaxInterval() << std::endl;
+            std::cout << "max: " << rt.getMaxInterval() << std::endl;
+            std::cout << "norm: " << rt.getNorm() << std::endl;
+            rt.reset();
             cntr = 0;
         }
+        rt.waitNextFrame();
     }
     // polling
     return 0;

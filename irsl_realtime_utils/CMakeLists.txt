@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.15)
 
 project(irsl_realtime_utils
   VERSION 0.0.1
@@ -17,6 +17,7 @@ target_include_directories(${targetname} INTERFACE
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
+target_link_libraries(${targetname} INTERFACE rt)
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
@@ -39,6 +40,7 @@ install(TARGETS ${targetname}
 
 install(EXPORT ${targetname}Targets
   FILE ${targetname}Config.cmake
+  NAMESPACE ${targetname}::
   DESTINATION lib/cmake/${targetname}
 )
 

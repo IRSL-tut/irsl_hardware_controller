@@ -1,11 +1,10 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.15)
 
 project(irsl_hardware_controller_tests)
 
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 find_package(irsl_common_utils  REQUIRED)
-find_package(yaml-cpp)
 
 ### debug print variables
 ##get_cmake_property(_variableNames CACHE_VARIABLES)
@@ -17,6 +16,5 @@ find_package(yaml-cpp)
 #endforeach()
 #message("VARIABLES<<<<")
 
-include_directories(${YAML_CPP_INCLUDE_DIR})
 add_executable(test_yaml test_yaml.cpp)
-target_link_libraries(test_yaml ${YAML_CPP_LIBRARIES} irsl_common_utils)
+target_link_libraries(test_yaml irsl_common_utils::irsl_common_utils)

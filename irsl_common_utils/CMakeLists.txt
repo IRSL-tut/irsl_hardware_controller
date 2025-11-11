@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.15)
 
 project(irsl_common_utils
-  VERSION 0.0.1
+  VERSION 0.99.1
   LANGUAGES CXX
 )
 
@@ -11,6 +11,17 @@ set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 set(targetname irsl_common_utils)
 
+### version config
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+  "${PROJECT_BINARY_DIR}/${targetname}ConfigVersion.cmake"
+  # VERSION 1.0.1
+  COMPATIBILITY AnyNewerVersion
+)
+install(FILES "${PROJECT_BINARY_DIR}/${targetname}ConfigVersion.cmake"
+  DESTINATION lib/cmake/${targetname}
+)
+
 #### export headerr-only
 ## ${PROJECT_SOURCE_DIR}/include will be installed
 add_library(${targetname} INTERFACE)
@@ -19,13 +30,30 @@ target_include_directories(${targetname} INTERFACE
   $<INSTALL_INTERFACE:include>
 )
 
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-  "${PROJECT_BINARY_DIR}/${targetname}ConfigVersion.cmake"
-  # VERSION 1.0.1
-  COMPATIBILITY AnyNewerVersion
+# find yaml-cpp (recommend CONFIG)
+find_package(yaml-cpp CONFIG REQUIRED)
+target_link_libraries(${targetname} INTERFACE yaml-cpp::yaml-cpp)
+
+configure_package_config_file(
+  "${PROJECT_SOURCE_DIR}/${targetname}Config.cmake.in"
+  "${PROJECT_BINARY_DIR}/${targetname}Config.cmake"
+  INSTALL_DESTINATION lib/cmake/${targetname}
 )
-install(FILES "${PROJECT_BINARY_DIR}/${targetname}ConfigVersion.cmake"
+
+# install Targets.cmake(exported target definitions)
+install(EXPORT ${targetname}Targets
+  FILE ${targetname}Targets.cmake
+  NAMESPACE ${targetname}::
+  DESTINATION lib/cmake/${targetname}
+)
+#install(EXPORT ${targetname}Targets
+#  FILE ${targetname}Config.cmake
+#  DESTINATION lib/cmake/${targetname}
+#)
+
+# install Config.cmake
+install(FILES
+  "${PROJECT_BINARY_DIR}/${targetname}Config.cmake"
   DESTINATION lib/cmake/${targetname}
 )
 
@@ -38,13 +66,7 @@ install(TARGETS ${targetname}
   BUNDLE        DESTINATION bin COMPONENT Runtime
 )
 
-install(EXPORT ${targetname}Targets
-  FILE ${targetname}Config.cmake
-  DESTINATION lib/cmake/${targetname}
-)
-
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION include)
-
 
 #### export header-only using .cmake.in
 ### .cmake.in should be below lines

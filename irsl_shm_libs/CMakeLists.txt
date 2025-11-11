@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.15)
 
 project(irsl_shm_libs
-  VERSION 0.0.1
+  VERSION 0.99.1
   LANGUAGES CXX
 )
 
@@ -12,10 +12,11 @@ set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 ## find_package(yaml-cpp)
 ## find_package(boost ...)
-set(targetname irsl_shm_controller)
+set(targetname irsl_shm_libs)
 
 add_library(${targetname} SHARED src/ShmManager.cpp src/ShmSettings.cpp src/ShmDataHeader.cpp src/open_shared_memory.cpp)
 include_directories(include)
+target_link_libraries(${targetname} pthread)
 
 ## target_link_libraries(${targetname} xxx)
 add_definitions(-Wno-pointer-arith)
@@ -40,6 +41,7 @@ install(TARGETS ${targetname}
 install(EXPORT irsl-hw-con-export
   FILE ${targetname}Config.cmake
   DESTINATION lib/cmake/${targetname}
+  NAMESPACE ${targetname}::
   EXPORT_LINK_INTERFACE_LIBRARIES
 )
 

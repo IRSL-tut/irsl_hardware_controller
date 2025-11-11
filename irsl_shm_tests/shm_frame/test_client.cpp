@@ -13,7 +13,7 @@ int main(int argc, char **argv)
     ShmSettings ss;
     ss.numJoints = 3;
     ss.numForceSensors = 1;
-    ss.numImuSensors   = 1;
+    ss.numImuSensors   = 0;
     ss.hash = 8888;
     ss.shm_key = 8889;
     //ss.extraDataSize = 0;
@@ -34,22 +34,22 @@ int main(int argc, char **argv)
 
     res = sm.checkHeader();
     std::cout << "checkHeader: " << res << std::endl;
-
+    if (!res) {
+        return -1;
+    }
     std::cout << "isOpen: " << sm.isOpen() << std::endl;
 
-    IntervalStatistics tm(10000);
-
+    RealtimeContext rt(0, 1000000, false);
     int cntr = 0;
-    tm.start();
+    rt.start();
     while(true) {
-        tm.sleepUntil(10000000);
-        tm.sync();
         cntr++;
-        if (cntr > 100) {
-            std::cout << "max: " << tm.getMaxInterval() << std::endl;
+        if (cntr > 1000) {
+            std::cout << "max: " << rt.getMaxInterval() << std::endl;
+            std::cout << "norm: " << rt.getNorm() << std::endl;
             uint64_t ff = sm.getFrame();
             std::cout << "ff: " << ff << std::endl;
-            tm.reset();
+            rt.reset();
             cntr = 0;
         }
     }
