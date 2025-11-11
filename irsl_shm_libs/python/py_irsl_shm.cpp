@@ -100,6 +100,7 @@ PYBIND11_MODULE(irsl_shm, m)
         .def(py::init<const ShmSettings &>())
         .def("readSettings", &ShmManager::readSettings, py::arg("fname"))
         .def("openSharedMemory", &ShmManager::openSharedMemory, py::arg("create") = true, py::arg("permission") = 0777)
+        .def("closeSharedMemory", &ShmManager::closeSharedMemory)
         .def("hasSettings", &ShmManager::hasSettings)
         .def("settings", &ShmManager::settings, py::return_value_policy::reference_internal)
         .def("setSettings", &ShmManager::setSettings)
@@ -120,20 +121,34 @@ PYBIND11_MODULE(irsl_shm, m)
         })
         .def("setTime", &ShmManager::setTime, py::arg("sec"), py::arg("nsec"))
         // Data read helpers returning vectors
-        .def("readStatus", [](ShmManager &self) { return read_vec<uint64_t>([&](auto &v){ return self.readStatus(v); }, "Status"); })
-        .def("readPositionCurrent", [](ShmManager &self) { return read_vec<irsl_float_type>([&](auto &v){ return self.readPositionCurrent(v); }, "PositionCurrent"); })
-        .def("readPositionCurrentAux", [](ShmManager &self) { return read_vec<irsl_float_type>([&](auto &v){ return self.readPositionCurrentAux(v); }, "PositionCurrentAux"); })
-        .def("readPositionCommand", [](ShmManager &self) { return read_vec<irsl_float_type>([&](auto &v){ return self.readPositionCommand(v); }, "PositionCommand"); })
-        .def("readPositionPgain", [](ShmManager &self) { return read_vec<irsl_float_type>([&](auto &v){ return self.readPositionPgain(v); }, "PositionPgain"); })
-        .def("readPositionDgain", [](ShmManager &self) { return read_vec<irsl_float_type>([&](auto &v){ return self.readPositionDgain(v); }, "PositionDgain"); })
-        .def("readVelocityCurrent", [](ShmManager &self) { return read_vec<irsl_float_type>([&](auto &v){ return self.readVelocityCurrent(v); }, "VelocityCurrent"); })
-        .def("readVelocityCommand", [](ShmManager &self) { return read_vec<irsl_float_type>([&](auto &v){ return self.readVelocityCommand(v); }, "VelocityCommand"); })
-        .def("readVelocityPgain", [](ShmManager &self) { return read_vec<irsl_float_type>([&](auto &v){ return self.readVelocityPgain(v); }, "VelocityPgain"); })
-        .def("readVelocityDgain", [](ShmManager &self) { return read_vec<irsl_float_type>([&](auto &v){ return self.readVelocityDgain(v); }, "VelocityDgain"); })
-        .def("readTorqueCurrent", [](ShmManager &self) { return read_vec<irsl_float_type>([&](auto &v){ return self.readTorqueCurrent(v); }, "TorqueCurrent"); })
-        .def("readTorqueCommand", [](ShmManager &self) { return read_vec<irsl_float_type>([&](auto &v){ return self.readTorqueCommand(v); }, "TorqueCommand"); })
-        .def("readTorquePgain", [](ShmManager &self) { return read_vec<irsl_float_type>([&](auto &v){ return self.readTorquePgain(v); }, "TorquePgain"); })
-        .def("readTorqueDgain", [](ShmManager &self) { return read_vec<irsl_float_type>([&](auto &v){ return self.readTorqueDgain(v); }, "TorqueDgain"); })
+        .def("readStatus", [](ShmManager &self, int offset) {
+            return read_vec<uint64_t>([&](auto &v){ return self.readStatus(v, offset); }, "Status"); }, py::arg("offset")=0)
+        .def("readPositionCurrent", [](ShmManager &self, int offset) {
+            return read_vec<irsl_float_type>([&](auto &v){ return self.readPositionCurrent(v, offset); }, "PositionCurrent"); }, py::arg("offset")=0)
+        .def("readPositionCurrentAux", [](ShmManager &self, int offset) {
+            return read_vec<irsl_float_type>([&](auto &v){ return self.readPositionCurrentAux(v, offset); }, "PositionCurrentAux"); }, py::arg("offset")=0)
+        .def("readPositionCommand", [](ShmManager &self, int offset) {
+            return read_vec<irsl_float_type>([&](auto &v){ return self.readPositionCommand(v, offset); }, "PositionCommand"); }, py::arg("offset")=0)
+        .def("readPositionPgain", [](ShmManager &self, int offset) {
+            return read_vec<irsl_float_type>([&](auto &v){ return self.readPositionPgain(v, offset); }, "PositionPgain"); }, py::arg("offset")=0)
+        .def("readPositionDgain", [](ShmManager &self, int offset) {
+            return read_vec<irsl_float_type>([&](auto &v){ return self.readPositionDgain(v, offset); }, "PositionDgain"); }, py::arg("offset")=0)
+        .def("readVelocityCurrent", [](ShmManager &self, int offset) {
+            return read_vec<irsl_float_type>([&](auto &v){ return self.readVelocityCurrent(v, offset); }, "VelocityCurrent"); }, py::arg("offset")=0)
+        .def("readVelocityCommand", [](ShmManager &self, int offset) {
+            return read_vec<irsl_float_type>([&](auto &v){ return self.readVelocityCommand(v, offset); }, "VelocityCommand"); }, py::arg("offset")=0)
+        .def("readVelocityPgain", [](ShmManager &self, int offset) {
+            return read_vec<irsl_float_type>([&](auto &v){ return self.readVelocityPgain(v, offset); }, "VelocityPgain"); }, py::arg("offset")=0)
+        .def("readVelocityDgain", [](ShmManager &self, int offset) {
+            return read_vec<irsl_float_type>([&](auto &v){ return self.readVelocityDgain(v, offset); }, "VelocityDgain"); }, py::arg("offset")=0)
+        .def("readTorqueCurrent", [](ShmManager &self, int offset) {
+            return read_vec<irsl_float_type>([&](auto &v){ return self.readTorqueCurrent(v, offset); }, "TorqueCurrent"); }, py::arg("offset")=0)
+        .def("readTorqueCommand", [](ShmManager &self, int offset) {
+            return read_vec<irsl_float_type>([&](auto &v){ return self.readTorqueCommand(v, offset); }, "TorqueCommand"); }, py::arg("offset")=0)
+        .def("readTorquePgain", [](ShmManager &self, int offset) {
+            return read_vec<irsl_float_type>([&](auto &v){ return self.readTorquePgain(v, offset); }, "TorquePgain"); }, py::arg("offset")=0)
+        .def("readTorqueDgain", [](ShmManager &self, int offset) {
+            return read_vec<irsl_float_type>([&](auto &v){ return self.readTorqueDgain(v, offset); }, "TorqueDgain"); }, py::arg("offset")=0)
         .def("readForceSensor", [](ShmManager &self, int id) {
             std::vector<irsl_float_type> out;
             if (!self.readForceSensor(id, out)) {
@@ -149,20 +164,34 @@ PYBIND11_MODULE(irsl_shm, m)
             return out;
         }, py::arg("id"))
         // Write helpers consuming Python lists
-        .def("writeStatus", [](ShmManager &self, const std::vector<uint64_t> &v) { write_vec<uint64_t>([&](auto &x){ return self.writeStatus(x); }, v, "Status"); })
-        .def("writePositionCurrent", [](ShmManager &self, const std::vector<irsl_float_type> &v) { write_vec<irsl_float_type>([&](auto &x){ return self.writePositionCurrent(x); }, v, "PositionCurrent"); })
-        .def("writePositionCurrentAux", [](ShmManager &self, const std::vector<irsl_float_type> &v) { write_vec<irsl_float_type>([&](auto &x){ return self.writePositionCurrentAux(x); }, v, "PositionCurrentAux"); })
-        .def("writePositionCommand", [](ShmManager &self, const std::vector<irsl_float_type> &v) { write_vec<irsl_float_type>([&](auto &x){ return self.writePositionCommand(x); }, v, "PositionCommand"); })
-        .def("writePositionPgain", [](ShmManager &self, const std::vector<irsl_float_type> &v) { write_vec<irsl_float_type>([&](auto &x){ return self.writePositionPgain(x); }, v, "PositionPgain"); })
-        .def("writePositionDgain", [](ShmManager &self, const std::vector<irsl_float_type> &v) { write_vec<irsl_float_type>([&](auto &x){ return self.writePositionDgain(x); }, v, "PositionDgain"); })
-        .def("writeVelocityCurrent", [](ShmManager &self, const std::vector<irsl_float_type> &v) { write_vec<irsl_float_type>([&](auto &x){ return self.writeVelocityCurrent(x); }, v, "VelocityCurrent"); })
-        .def("writeVelocityCommand", [](ShmManager &self, const std::vector<irsl_float_type> &v) { write_vec<irsl_float_type>([&](auto &x){ return self.writeVelocityCommand(x); }, v, "VelocityCommand"); })
-        .def("writeVelocityPgain", [](ShmManager &self, const std::vector<irsl_float_type> &v) { write_vec<irsl_float_type>([&](auto &x){ return self.writeVelocityPgain(x); }, v, "VelocityPgain"); })
-        .def("writeVelocityDgain", [](ShmManager &self, const std::vector<irsl_float_type> &v) { write_vec<irsl_float_type>([&](auto &x){ return self.writeVelocityDgain(x); }, v, "VelocityDgain"); })
-        .def("writeTorqueCurrent", [](ShmManager &self, const std::vector<irsl_float_type> &v) { write_vec<irsl_float_type>([&](auto &x){ return self.writeTorqueCurrent(x); }, v, "TorqueCurrent"); })
-        .def("writeTorqueCommand", [](ShmManager &self, const std::vector<irsl_float_type> &v) { write_vec<irsl_float_type>([&](auto &x){ return self.writeTorqueCommand(x); }, v, "TorqueCommand"); })
-        .def("writeTorquePgain", [](ShmManager &self, const std::vector<irsl_float_type> &v) { write_vec<irsl_float_type>([&](auto &x){ return self.writeTorquePgain(x); }, v, "TorquePgain"); })
-        .def("writeTorqueDgain", [](ShmManager &self, const std::vector<irsl_float_type> &v) { write_vec<irsl_float_type>([&](auto &x){ return self.writeTorqueDgain(x); }, v, "TorqueDgain"); })
+        .def("writeStatus", [](ShmManager &self, const std::vector<uint64_t> &v, int offset) {
+            write_vec<uint64_t>([&](auto &x){ return self.writeStatus(x, offset); }, v, "Status"); }, py::arg("v"), py::arg("offset")=0)
+        .def("writePositionCurrent", [](ShmManager &self, const std::vector<irsl_float_type> &v, int offset) {
+            write_vec<irsl_float_type>([&](auto &x){ return self.writePositionCurrent(x, offset); }, v, "PositionCurrent"); }, py::arg("v"), py::arg("offset")=0)
+        .def("writePositionCurrentAux", [](ShmManager &self, const std::vector<irsl_float_type> &v, int offset) {
+            write_vec<irsl_float_type>([&](auto &x){ return self.writePositionCurrentAux(x, offset); }, v, "PositionCurrentAux"); }, py::arg("v"), py::arg("offset")=0)
+        .def("writePositionCommand", [](ShmManager &self, const std::vector<irsl_float_type> &v, int offset) {
+            write_vec<irsl_float_type>([&](auto &x){ return self.writePositionCommand(x, offset); }, v, "PositionCommand"); }, py::arg("v"), py::arg("offset")=0)
+        .def("writePositionPgain", [](ShmManager &self, const std::vector<irsl_float_type> &v, int offset) {
+            write_vec<irsl_float_type>([&](auto &x){ return self.writePositionPgain(x, offset); }, v, "PositionPgain"); }, py::arg("v"), py::arg("offset")=0)
+        .def("writePositionDgain", [](ShmManager &self, const std::vector<irsl_float_type> &v, int offset) {
+            write_vec<irsl_float_type>([&](auto &x){ return self.writePositionDgain(x, offset); }, v, "PositionDgain"); }, py::arg("v"), py::arg("offset")=0)
+        .def("writeVelocityCurrent", [](ShmManager &self, const std::vector<irsl_float_type> &v, int offset) {
+            write_vec<irsl_float_type>([&](auto &x){ return self.writeVelocityCurrent(x, offset); }, v, "VelocityCurrent"); }, py::arg("v"), py::arg("offset")=0)
+        .def("writeVelocityCommand", [](ShmManager &self, const std::vector<irsl_float_type> &v, int offset) {
+            write_vec<irsl_float_type>([&](auto &x){ return self.writeVelocityCommand(x, offset); }, v, "VelocityCommand"); }, py::arg("v"), py::arg("offset")=0)
+        .def("writeVelocityPgain", [](ShmManager &self, const std::vector<irsl_float_type> &v, int offset) {
+            write_vec<irsl_float_type>([&](auto &x){ return self.writeVelocityPgain(x, offset); }, v, "VelocityPgain"); }, py::arg("v"), py::arg("offset")=0)
+        .def("writeVelocityDgain", [](ShmManager &self, const std::vector<irsl_float_type> &v, int offset) {
+            write_vec<irsl_float_type>([&](auto &x){ return self.writeVelocityDgain(x, offset); }, v, "VelocityDgain"); }, py::arg("v"), py::arg("offset")=0)
+        .def("writeTorqueCurrent", [](ShmManager &self, const std::vector<irsl_float_type> &v, int offset) {
+            write_vec<irsl_float_type>([&](auto &x){ return self.writeTorqueCurrent(x, offset); }, v, "TorqueCurrent"); }, py::arg("v"), py::arg("offset")=0)
+        .def("writeTorqueCommand", [](ShmManager &self, const std::vector<irsl_float_type> &v, int offset) {
+            write_vec<irsl_float_type>([&](auto &x){ return self.writeTorqueCommand(x, offset); }, v, "TorqueCommand"); }, py::arg("v"), py::arg("offset")=0)
+        .def("writeTorquePgain", [](ShmManager &self, const std::vector<irsl_float_type> &v, int offset) {
+            write_vec<irsl_float_type>([&](auto &x){ return self.writeTorquePgain(x, offset); }, v, "TorquePgain"); }, py::arg("v"), py::arg("offset")=0)
+        .def("writeTorqueDgain", [](ShmManager &self, const std::vector<irsl_float_type> &v, int offset) {
+            write_vec<irsl_float_type>([&](auto &x){ return self.writeTorqueDgain(x, offset); }, v, "TorqueDgain"); }, py::arg("v"), py::arg("offset")=0)
         .def("writeForceSensor", [](ShmManager &self, int id, const std::vector<irsl_float_type> &v) {
             if (!self.writeForceSensor(id, v)) {
                 throw std::runtime_error("Failed to write ForceSensor");

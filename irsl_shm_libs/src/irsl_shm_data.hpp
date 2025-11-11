@@ -7,25 +7,31 @@ namespace irsl_shm_controller
 {
 
 #define define_joint_method(fname,vartype)                              \
-    inline bool read##fname (std::vector<vartype> &res) {               \
+    inline bool read##fname (std::vector<vartype> &ouv, int rd_st) {    \
         int offset_ = offset_##fname;                                   \
         if (offset_ < 0) { return false; }                              \
-        if(res.size() != joint_size) {                                  \
-            res.resize(joint_size);                                     \
+        size_t sz = ouv.size();                                         \
+        int num = 0;                                                    \
+        if(sz == 0) {                                                   \
+            num = joint_size - rd_st;                                   \
+            ouv.resize(num);                                            \
+        } else {                                                        \
+            num = sz > (joint_size - rd_st) ? (joint_size - rd_st) : sz; \
         }                                                               \
-        vartype *dst = (vartype *)res.data();                           \
-        const vartype *src = (const vartype *)(ptr + offset_);          \
-        for(int i = 0; i < joint_size; i++) {                           \
+        vartype *dst = (vartype *)ouv.data();                           \
+        const vartype *src = (const vartype *)(ptr + offset_ + sizeof(vartype)*rd_st); \
+        for(int i = 0; i < num; i++) {                                  \
             dst[i] = src[i];                                            \
         }                                                               \
         return true;                                                    \
     }                                                                   \
-    inline bool write##fname (const std::vector<vartype> &res) {        \
+    inline bool write##fname (const std::vector<vartype> &in_v, int wt_st) { \
         int offset_ = offset_##fname;                                   \
         if (offset_ < 0) { return false; }                              \
-        int num = res.size() > joint_size ? joint_size : res.size();    \
-        vartype *dst = (vartype *)(ptr + offset_);                      \
-        const vartype *src = (const vartype *)res.data();               \
+        size_t sz = in_v.size();                                        \
+        int num = sz > (joint_size - wt_st) ? (joint_size - wt_st) : sz; \
+        vartype *dst = (vartype *)(ptr + offset_ + sizeof(vartype)*wt_st); \
+        const vartype *src = (const vartype *)in_v.data();              \
         for(int i = 0; i < num; i++) {                                  \
             dst[i] = src[i];                                            \
         }                                                               \

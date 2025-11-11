@@ -37,8 +37,9 @@ static inline long time_diff(timespec &a, timespec &b) // a - b
 }
 
 class IntervalStatistics {
+private:
     const double m_interval_u; // u_sec
-    timespec m_t; // current_time
+    timespec s_m_t; // current_time
     double n;
     double norm2;
     double max_interval_u; // u_sec
@@ -50,19 +51,19 @@ public:
         max_interval_u( - NSEC_PER_SEC ),
         min_interval_u( NSEC_PER_SEC )
     {
-        clock_gettime( CLOCK_MONOTONIC, &m_t );
+        clock_gettime( CLOCK_MONOTONIC, &s_m_t );
     }
     void sync() // update clock & statistics
     {
         timespec now_t;
         clock_gettime( CLOCK_MONOTONIC, &now_t );
 
-        const double measured_interval_u = ( (now_t.tv_sec - m_t.tv_sec)*NSEC_PER_SEC + (now_t.tv_nsec - m_t.tv_nsec) )/1000.0;
+        const double measured_interval_u = ( (now_t.tv_sec - s_m_t.tv_sec)*NSEC_PER_SEC + (now_t.tv_nsec - s_m_t.tv_nsec) )/1000.0;
         if (measured_interval_u > max_interval_u) max_interval_u = measured_interval_u;
         if (measured_interval_u < min_interval_u) min_interval_u = measured_interval_u;
         // 前フレームの時刻として保存
-        m_t.tv_sec  = now_t.tv_sec;
-        m_t.tv_nsec = now_t.tv_nsec;
+        s_m_t.tv_sec  = now_t.tv_sec;
+        s_m_t.tv_nsec = now_t.tv_nsec;
 
         const double next_n     = n + 1.0;
         const double rcp_next_n = 1.0 / next_n;
@@ -72,9 +73,9 @@ public:
         n = next_n;
         norm2 = next_norm2;
     }
-    void start(bool _reset = true) // first time
+    void startMeasure(bool _reset = true) // first time
     {
-        clock_gettime( CLOCK_MONOTONIC, &m_t );
+        clock_gettime( CLOCK_MONOTONIC, &s_m_t );
         if (_reset) {
             reset();
         }
@@ -83,7 +84,7 @@ public:
     {
         timespec now_t;
         clock_gettime( CLOCK_MONOTONIC, &now_t );
-        double measured_interval_usec = ( (now_t.tv_sec - m_t.tv_sec)*NSEC_PER_SEC + (now_t.tv_nsec - m_t.tv_nsec) )/1000.0;
+        double measured_interval_usec = ( (now_t.tv_sec - s_m_t.tv_sec)*NSEC_PER_SEC + (now_t.tv_nsec - s_m_t.tv_nsec) )/1000.0;
 
         return measured_interval_usec;
     }
@@ -91,8 +92,8 @@ public:
     {
         timespec now_t;
         clock_gettime( CLOCK_MONOTONIC, &now_t );
-        long measured_interval_nsec = (now_t.tv_nsec - m_t.tv_nsec);
-        measured_interval_nsec += (now_t.tv_sec - m_t.tv_sec)*NSEC_PER_SEC;
+        long measured_interval_nsec = (now_t.tv_nsec - s_m_t.tv_nsec);
+        measured_interval_nsec += (now_t.tv_sec - s_m_t.tv_sec)*NSEC_PER_SEC;
         return measured_interval_nsec;
     }
     void reset() // reset statistics
@@ -117,8 +118,8 @@ public:
     void sleepUntil (long time_in_nsec)
     {
         timespec target_t; // target time
-        target_t.tv_sec  = m_t.tv_sec;
-        target_t.tv_nsec = m_t.tv_nsec;
+        target_t.tv_sec  = s_m_t.tv_sec;
+        target_t.tv_nsec = s_m_t.tv_nsec;
 
         target_t.tv_nsec += time_in_nsec;
         while ( target_t.tv_nsec  >= NSEC_PER_SEC ) {
@@ -129,7 +130,8 @@ public:
     }
 };
 
-class RealtimeContext {
+class RealtimeContext : public IntervalStatistics {
+private:
     const int m_interval_n; // n_sec
     timespec m_t;
     void _increment_t(){
@@ -140,11 +142,10 @@ class RealtimeContext {
         }
     }
     int latency_fd;
-    IntervalStatistics _int_stat;
 
 public:
-    RealtimeContext( const int prio, const unsigned long interval_ns = 1000000 , const bool write_latency_fd = true)
-        : m_interval_n( interval_ns ), latency_fd(-1), _int_stat( interval_ns/1000 )
+    RealtimeContext(const unsigned long interval_ns = 1000000, const int prio = 0, const bool write_latency_fd = false)
+        : IntervalStatistics( interval_ns/1000 ), m_interval_n( interval_ns ), latency_fd(-1)
     {
         // see cyclictest in rt-tests
         if (write_latency_fd && latency_fd < 0) {
@@ -191,7 +192,7 @@ public:
     void start()
     {
         clock_gettime( CLOCK_MONOTONIC, &m_t );
-        _int_stat.start();
+        startMeasure();
     }
     long timeToNext()
     {
@@ -204,35 +205,7 @@ public:
     {
         _increment_t();
         clock_nanosleep( CLOCK_MONOTONIC, TIMER_ABSTIME, &m_t, NULL );
-        _int_stat.sync();
-    }
-    void statisticsSync ()
-    {
-        _int_stat.sync();
-    }
-    void statisticsStart ()
-    {
-        _int_stat.start();
-    }
-    void statisticsReset ()
-    {
-        _int_stat.reset();
-    }
-    double statisticsGetNorm ()
-    {
-        return _int_stat.getNorm();
-    }
-    double statisticsGetMaxInterval ()
-    {
-        return _int_stat.getMaxInterval();
-    }
-    double statisticsGetTimeUsec()
-    {
-        return _int_stat.getTimeUsec();
-    }
-    long statisticsGetTimeNsec()
-    {
-        return _int_stat.getTimeNsec();
+        sync();
     }
 };
 

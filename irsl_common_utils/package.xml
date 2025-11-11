@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>irsl_common_utils</name>
-  <version>0.0.1</version>
+  <version>0.99.1</version>
   <description>
     IRSL common_utils for shm-controller
   </description>
@@ -14,6 +14,8 @@
 
   <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
   <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake</buildtool_depend>
+
+  <depend>yaml-cpp</depend>
 
   <export>
     <build_type>cmake</build_type>

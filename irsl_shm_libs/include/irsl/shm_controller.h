@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include <semaphore.h>
+
 namespace irsl_shm_controller
 {
 
@@ -98,6 +100,8 @@ struct ShmDataHeader {
     uint64_t frame;
     int32_t  sec;
     int32_t  nsec;
+    sem_t main_sem;
+    sem_t sub_sem;
     //// getter
     uint64_t getHash();
     int getTotalSize();
@@ -109,9 +113,9 @@ struct ShmDataHeader {
     void writeSettings(ShmSettings &result);
 };
 
-#define define_read_write_method(fname,vartype)         \
-    bool read##fname (std::vector<vartype> &res);       \
-    bool write##fname (const std::vector<vartype> &res)
+#define define_read_write_method(fname,vartype)                       \
+    bool read##fname (std::vector<vartype> &res, int offset=0);       \
+    bool write##fname (const std::vector<vartype> &res, int offset=0)
 
 class ShmManager {
 
@@ -123,6 +127,7 @@ public:
 public:
     bool readSettings(const std::string &fname);
     bool openSharedMemory(bool create = true, uint16_t permission = 0777);
+    bool closeSharedMemory();
 
     bool hasSettings();
     const ShmSettings &settings();
@@ -130,6 +135,7 @@ public:
     bool isOpen();
 
     bool writeHeader();
+    bool readHeader();
     bool checkHeader();
     bool readFromHeader(ShmSettings &settings);
 
@@ -178,6 +184,7 @@ private:
 
 //
 void *open_shared_memory(const uint32_t _key, const uint64_t _size, int &shm_id, bool create = true, uint16_t permission = 0777);
+bool close_shared_memory(int shm_id);
 
 }
 

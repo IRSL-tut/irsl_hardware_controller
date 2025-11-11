@@ -1,0 +1,12 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+# find denendent libs
+find_dependency(yaml-cpp CONFIG)
+
+# include exported targets
+include("${CMAKE_CURRENT_LIST_DIR}/irsl_common_utilsTargets.cmake")
+
+### check required components if they are used
+# check_required_components("@PROJECT_NAME@")
