@@ -144,7 +144,7 @@ private:
     int latency_fd;
 
 public:
-    RealtimeContext( const int prio, const unsigned long interval_ns = 1000000 , const bool write_latency_fd = true)
+    RealtimeContext(const unsigned long interval_ns = 1000000, const int prio = 0, const bool write_latency_fd = false)
         : IntervalStatistics( interval_ns/1000 ), m_interval_n( interval_ns ), latency_fd(-1)
     {
         // see cyclictest in rt-tests

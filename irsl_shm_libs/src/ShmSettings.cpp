@@ -85,93 +85,93 @@ int ShmSettings::getOffsetData()
 {
     return sizeof(ShmDataHeader);
 }
-int ShmSettings::getOffsetStatus()
+int ShmSettings::getOffsetStatus() // 1 exist
 {
     return sizeof(ShmDataHeader) + 0*sizeof(irsl_float_type)*numJoints;
 }
-int ShmSettings::getOffsetPositionCurrent()
+int ShmSettings::getOffsetPositionCurrent() // 2 exist
 {
     return sizeof(ShmDataHeader) + 1*sizeof(irsl_float_type)*numJoints;
 }
-int ShmSettings::getOffsetPositionCurrentAux()
+int ShmSettings::getOffsetPositionCurrentAux() // 3 exist
 {
     return sizeof(ShmDataHeader) + 2*sizeof(irsl_float_type)*numJoints;
 }
-int ShmSettings::getOffsetPositionCommand()
+int ShmSettings::getOffsetPositionCommand() // 4 optional
 {
     if (!(jointType & JointType::PositionCommand)) return -1;
     return sizeof(ShmDataHeader) + 3*sizeof(irsl_float_type)*numJoints;
 }
-int ShmSettings::getOffsetPositionPgain()
+int ShmSettings::getOffsetPositionPgain() // 5 optional*
 {
     if (!(jointType & JointType::PositionGains)) return -1;
     int off_ = 3;
     if (jointType & JointType::PositionCommand) off_ += 1;
     return sizeof(ShmDataHeader) + off_*sizeof(irsl_float_type)*numJoints;
 }
-int ShmSettings::getOffsetPositionDgain()
+int ShmSettings::getOffsetPositionDgain() // 6 optional*
 {
     if (!(jointType & JointType::PositionGains)) return -1;
     int off_ = 3;
     if (jointType & JointType::PositionCommand) off_ += 1;
     return sizeof(ShmDataHeader) + (off_ + 1)*sizeof(irsl_float_type)*numJoints;
 }
-int ShmSettings::getOffsetVelocityCurrent()
+int ShmSettings::getOffsetVelocityCurrent() // 7 exist
 {
     int off_ = 3;
     if (jointType & JointType::PositionCommand) off_ += 1;
     if (jointType & JointType::PositionGains)   off_ += 2;
     return sizeof(ShmDataHeader) + off_*sizeof(irsl_float_type)*numJoints;
 }
-int ShmSettings::getOffsetVelocityCommand()
+int ShmSettings::getOffsetVelocityCommand() // 8 optional
 {
     if (!(jointType & JointType::VelocityCommand)) return -1;
-    int off_ = 3;
+    int off_ = 4;
     if (jointType & JointType::PositionCommand) off_ += 1;
     if (jointType & JointType::PositionGains)   off_ += 2;
-    return sizeof(ShmDataHeader) + (off_ + 1)*sizeof(irsl_float_type)*numJoints;
+    return sizeof(ShmDataHeader) + off_*sizeof(irsl_float_type)*numJoints;
 }
-int ShmSettings::getOffsetVelocityPgain()
+int ShmSettings::getOffsetVelocityPgain() // 9 optional**
 {
     if (!(jointType & JointType::VelocityGains)) return -1;
-    int off_ = 3;
+    int off_ = 4;
     if (jointType & JointType::PositionCommand) off_ += 1;
     if (jointType & JointType::PositionGains)   off_ += 2;
     if (jointType & JointType::VelocityCommand) off_ += 1;
     return sizeof(ShmDataHeader) + off_*sizeof(irsl_float_type)*numJoints;
 }
-int ShmSettings::getOffsetVelocityDgain()
+int ShmSettings::getOffsetVelocityDgain() // 10 optional**
 {
     if (!(jointType & JointType::VelocityGains)) return -1;
-    int off_ = 3;
+    int off_ = 4;
     if (jointType & JointType::PositionCommand) off_ += 1;
     if (jointType & JointType::PositionGains)   off_ += 2;
     if (jointType & JointType::VelocityCommand) off_ += 1;
     return sizeof(ShmDataHeader) + (off_ + 1)*sizeof(irsl_float_type)*numJoints;
 }
-int ShmSettings::getOffsetTorqueCurrent()
+int ShmSettings::getOffsetTorqueCurrent() // 11 exist
 {
-    int off_ = 3;
+    int off_ = 4;
     if (jointType & JointType::PositionCommand) off_ += 1;
     if (jointType & JointType::PositionGains)   off_ += 2;
     if (jointType & JointType::VelocityCommand) off_ += 1;
     if (jointType & JointType::VelocityGains)   off_ += 2;
     return sizeof(ShmDataHeader) + off_*sizeof(irsl_float_type)*numJoints;
 }
-int ShmSettings::getOffsetTorqueCommand()
+int ShmSettings::getOffsetTorqueCommand() // 12 optional
 {
     if (!(jointType & JointType::TorqueCommand)) return -1;
-    int off_ = 3;
+    int off_ = 5;
     if (jointType & JointType::PositionCommand) off_ += 1;
     if (jointType & JointType::PositionGains)   off_ += 2;
     if (jointType & JointType::VelocityCommand) off_ += 1;
     if (jointType & JointType::VelocityGains)   off_ += 2;
-    return sizeof(ShmDataHeader) + (off_ + 1)*sizeof(irsl_float_type)*numJoints;
+    return sizeof(ShmDataHeader) + off_*sizeof(irsl_float_type)*numJoints;
 }
-int ShmSettings::getOffsetTorquePgain()
+int ShmSettings::getOffsetTorquePgain() // 13 optional***
 {
     if (!(jointType & JointType::VelocityGains)) return -1;
-    int off_ = 3;
+    int off_ = 5;
     if (jointType & JointType::PositionCommand) off_ += 1;
     if (jointType & JointType::PositionGains)   off_ += 2;
     if (jointType & JointType::VelocityCommand) off_ += 1;
@@ -179,10 +179,10 @@ int ShmSettings::getOffsetTorquePgain()
     if (jointType & JointType::TorqueCommand)   off_ += 1;
     return sizeof(ShmDataHeader) + off_*sizeof(irsl_float_type)*numJoints;
 }
-int ShmSettings::getOffsetTorqueDgain()
+int ShmSettings::getOffsetTorqueDgain() // 14 optional***
 {
     if (!(jointType & JointType::VelocityGains)) return -1;
-    int off_ = 3;
+    int off_ = 5;
     if (jointType & JointType::PositionCommand) off_ += 1;
     if (jointType & JointType::PositionGains)   off_ += 2;
     if (jointType & JointType::VelocityCommand) off_ += 1;

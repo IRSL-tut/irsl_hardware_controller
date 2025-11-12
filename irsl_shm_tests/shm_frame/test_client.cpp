@@ -11,19 +11,14 @@ int main(int argc, char **argv)
     std::cout << "ShmDataHeader: " << sizeof(ShmDataHeader) << std::endl;
 
     ShmSettings ss;
-    ss.numJoints = 3;
-    ss.numForceSensors = 1;
-    ss.numImuSensors   = 0;
+    //ss.numJoints = 3;
+    //ss.numForceSensors = 1;
+    //ss.numImuSensors   = 0;
     ss.hash = 8888;
     ss.shm_key = 8889;
     //ss.extraDataSize = 0;
     //ss.extraDataSize = 96;
-    // ss.jointType =
-    std::cout << "TotalSize: "  << ss.calcTotalSize() << std::endl;
-    std::cout << "SingleSize: " << ss.getSizeOfSingleJointData() << std::endl;
-
-    std::vector<uint8_t> data;
-    ss.setHeaderData(data);
+    //ss.jointType =
 
     ////
     ShmManager sm(ss);
@@ -37,9 +32,15 @@ int main(int argc, char **argv)
     if (!res) {
         return -1;
     }
+    std::cout << "numJoints: " << sm.settings().numJoints << std::endl;
+    std::cout << "numFsensor: " << sm.settings().numForceSensors << std::endl;
+    std::cout << "numIsensor: " << sm.settings().numImuSensors << std::endl;
+    std::cout << "exdata: " << sm.settings().extraDataSize << std::endl;
+    std::cout << "total: " << sm.settings().totalSize << std::endl;
+    std::cout << "jointType: " << sm.settings().jointType << std::endl;
     std::cout << "isOpen: " << sm.isOpen() << std::endl;
 
-    RealtimeContext rt(0, 1000000, false);
+    RealtimeContext rt(1000000);
     int cntr = 0;
     rt.start();
     while(true) {
@@ -52,6 +53,7 @@ int main(int argc, char **argv)
             rt.reset();
             cntr = 0;
         }
+        rt.waitNextFrame();
     }
     // polling
     return 0;

@@ -109,9 +109,9 @@ struct ShmDataHeader {
     void writeSettings(ShmSettings &result);
 };
 
-#define define_read_write_method(fname,vartype)         \
-    bool read##fname (std::vector<vartype> &res);       \
-    bool write##fname (const std::vector<vartype> &res)
+#define define_read_write_method(fname,vartype)                       \
+    bool read##fname (std::vector<vartype> &res, int offset=0);       \
+    bool write##fname (const std::vector<vartype> &res, int offset=0)
 
 class ShmManager {
 
@@ -130,6 +130,7 @@ public:
     bool isOpen();
 
     bool writeHeader();
+    bool readHeader();
     bool checkHeader();
     bool readFromHeader(ShmSettings &settings);
 

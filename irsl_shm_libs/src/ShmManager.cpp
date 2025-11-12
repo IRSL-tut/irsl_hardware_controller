@@ -36,13 +36,27 @@ bool ShmManager::readSettings(const std::string &fname)
 }
 bool ShmManager::openSharedMemory(bool create, uint16_t permission)
 {
-    if(hasSettings() && impl->current_settings.totalSize > 0) {
-        void *res = open_shared_memory(impl->current_settings.shm_key, impl->current_settings.totalSize,
+    if (hasSettings() && (!create || impl->current_settings.totalSize > 0)) {
+        void *res = open_shared_memory(impl->current_settings.shm_key,
+                                       impl->current_settings.totalSize,
                                        impl->shm_id, create, permission);
-        if (!!res) {
-            impl->setPointer(res);
+        if (!res) {
+            std::cerr << "shm open error" << std::endl;
+            return false; // TODO exception
+        }
+        impl->setPointer(res);
+        if (create) {
+            bool suc = writeHeader();
+            if (!suc) {
+                std::cerr << "writeHeader error" << std::endl;
+                return false; // TODO exception
+            }
         } else {
-            return false;
+            bool suc = readHeader();
+            if (!suc) {
+                std::cerr << "readHeader error" << std::endl;
+                return false; // TODO exception
+            }
         }
         return true;
     }
@@ -76,6 +90,17 @@ bool ShmManager::isOpen()
 bool ShmManager::writeHeader()
 {
     return impl->writeHeader(impl->current_settings);
+}
+bool ShmManager::readHeader()
+{
+    ShmSettings hdr_settings;
+    bool res = readFromHeader(hdr_settings);
+    if (hdr_settings.hash != impl->current_settings.hash) {
+        return false;
+    }
+    readFromHeader(impl->current_settings);
+    impl->updateBySettings(impl->current_settings);
+    return true;
 }
 bool ShmManager::checkHeader()
 {
@@ -130,13 +155,13 @@ bool ShmManager::setTime(const int32_t sec, const int32_t nsec)
 }
 
 #define generate_read_write_method(fname,vartype)          \
-bool ShmManager::read##fname (std::vector<vartype> &res) \
-{                                                        \
-    return impl->read##fname(res);                       \
-}                                                               \
-bool ShmManager::write##fname (const std::vector<vartype> &res) \
-{                                                               \
-    return impl->write##fname(res);                             \
+bool ShmManager::read##fname (std::vector<vartype> &res, int offset) \
+{                                                                       \
+    return impl->read##fname(res, offset);                              \
+}                                                                       \
+bool ShmManager::write##fname (const std::vector<vartype> &res, int offset)  \
+{                                                                       \
+    return impl->write##fname(res, offset);                             \
 }
 
 generate_read_write_method(Status,uint64_t);
