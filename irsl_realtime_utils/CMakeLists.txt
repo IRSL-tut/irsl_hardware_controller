@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 
 project(irsl_realtime_utils
-  VERSION 0.0.1
+  VERSION 0.99.1
   LANGUAGES CXX
 )
 

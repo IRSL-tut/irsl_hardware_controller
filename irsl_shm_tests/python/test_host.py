@@ -54,9 +54,7 @@ cur_st.getOffsetForceSensor()
 cur_st.getOffsetImuSensor()
 cur_st.getOffsetExtraData()
 
-
-
-
+sm_host.closeSharedMemory()
 
 
 

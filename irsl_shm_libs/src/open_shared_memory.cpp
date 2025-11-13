@@ -43,4 +43,11 @@ void *open_shared_memory(const uint32_t _key, const uint64_t _size, int &shm_id,
     return ptr;
 }
 
+bool close_shared_memory(int shm_id)
+{
+    int res = shmctl(shm_id, IPC_RMID, nullptr);
+    std::cerr << "close: " << res << std::endl;
+    return true;
+}
+
 }

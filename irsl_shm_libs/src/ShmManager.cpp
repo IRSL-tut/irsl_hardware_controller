@@ -63,6 +63,13 @@ bool ShmManager::openSharedMemory(bool create, uint16_t permission)
     // TODO: check result
     return false;
 }
+bool ShmManager::closeSharedMemory()
+{
+    if (impl->shm_id > 0) {
+        return close_shared_memory(impl->shm_id);
+    }
+    return false;
+}
 bool ShmManager::hasSettings()
 {
     if (impl->current_settings.hash != 0) {
