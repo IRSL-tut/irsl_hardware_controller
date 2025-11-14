@@ -32,7 +32,13 @@ target_include_directories(${targetname} INTERFACE
 
 # find yaml-cpp (recommend CONFIG)
 find_package(yaml-cpp CONFIG REQUIRED)
-target_link_libraries(${targetname} INTERFACE yaml-cpp::yaml-cpp)
+if(TARGET yaml-cpp::yaml-cpp)
+  target_link_libraries(${targetname} INTERFACE yaml-cpp::yaml-cpp)
+elseif(TARGET yaml-cpp)
+  target_link_libraries(${targetname} INTERFACE yaml-cpp)
+else()
+  message("DO NOT FIND INTERFACE: yaml-cpp, yaml-cpp::yaml-cpp")
+endif()
 
 configure_package_config_file(
   "${PROJECT_SOURCE_DIR}/${targetname}Config.cmake.in"
