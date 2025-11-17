@@ -1,4 +1,4 @@
-%autoindent
+# %autoindent
 import sys
 sys.path.append('.')
 import irsl_shm
@@ -21,10 +21,10 @@ sm_host.openSharedMemory(True)
 
 sm_host.writePositionCurrent([1., 2., 3., 4., 5.])
 sm_host.writeVelocityCurrent([10., 20., 30., 40., 50.])
-sm_host.writeTorqueCurrent([-1., -2., -3., -4., -5.])
+sm_host.writeTorqueCurrent([100., 200., 300., 400., 500.])
 
-sm_host.writePositionCommand([1., 2., 3., 4., 5.])
-sm_host.writeVelocityCommand([10., 20., 30., 40., 50.])
+sm_host.writePositionCommand([-0.1, -0.2, -0.3, -0.4, -0.5])
+sm_host.writeVelocityCommand([-10., -20., -30., -40., -50.])
 
 sm_host.readPositionCurrent()
 sm_host.readVelocityCurrent()

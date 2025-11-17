@@ -1,0 +1,2 @@
+ln -sf  ../../../../install/share/irsl_shm_libs/irsl_shm.cpython-312-x86_64-linux-gnu.so
+source ../../../../install/setup.bash
