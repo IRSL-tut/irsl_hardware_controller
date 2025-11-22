@@ -1,20 +1,26 @@
-
 val_str: "val_str"
 val_int: 98765
 val_flt: 1.23456
 
 list_str: ["a", "b", "c", "d"]
 
-map_str:
-  a: "val_a"
-  b: "val_b"
-  c: "val_c"
+map_flt:
+  val_a: 0.1
+  val_b: 0.2
+  val_c: 0.3
 
 struct_a:
-  val_str: "val_str"
-  val_int: 98765
+  s_int: 4321
+  s_str: "val_str"
+
+struct_b:
   val_flt: 1.23456
   val_list: [1, 2, 3, 4]
   val_struct:
-    s_int: 4321
-    s_str: "val_str"
+    s_int: 567
+    s_str: "str_str"
+
+struct_b_test:
+  hoge:
+    moge:
+      "fuga"
