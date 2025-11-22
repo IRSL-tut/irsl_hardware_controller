@@ -16,9 +16,37 @@ using yamlList = std::vector<T>;
 template <typename T>
 using yamlMap  = std::unordered_map<std::string, T>;
 
+typedef YAML::Node Node;
+
+//// loading parsing yaml
+Node Load(const std::string& input)
+{
+    return YAML::Load(input);
+}
+Node Load(std::istream& input)
+{
+    return YAML::Load(input);
+}
+Node LoadFile(const std::string& filename)
+{
+    return YAML::LoadFile(filename);
+}
+std::vector<Node> LoadAll(const std::string& input)
+{
+    return YAML::LoadAll(input);
+}
+std::vector<Node> LoadAll(std::istream& input)
+{
+    return YAML::LoadAll(input);
+}
+std::vector<Node> LoadAllFromFile(const std::string& filename)
+{
+    return YAML::LoadAllFromFile(filename);
+}
+
 //// read simple (require to define convert)
 template <typename T>
-bool readValue(YAML::Node &node, const std::string &key, T &value)
+bool readValue(const YAML::Node &node, const std::string &key, T &value)
 {
     if ( node[key] ) {
         YAML::Node n = node[key];
@@ -53,7 +81,7 @@ bool readList(const YAML::Node &node, yamlList<T> &vlist)
 }
 
 template <typename T>
-bool readValueList(YAML::Node &node, const std::string &key, yamlList<T> &vlist)
+bool readValueList(const YAML::Node &node, const std::string &key, yamlList<T> &vlist)
 {
     if ( node[key] ) {
         YAML::Node n = node[key];
@@ -71,7 +99,7 @@ bool readMap(const YAML::Node &node, yamlMap<T> &vmap)
                 std::string key = it->first.as<std::string>();
                 T value = it->second.as<T>();
                 vmap.emplace(key, value);
-            } catch (const std::exception&) {
+            } catch (const std::exception &e) {
                 return false;
             }
         }
@@ -81,11 +109,11 @@ bool readMap(const YAML::Node &node, yamlMap<T> &vmap)
 }
 
 template <typename T>
-bool readValueMap(YAML::Node &node, const std::string &key, yamlMap<T> &vmap)
+bool readValueMap(const YAML::Node &node, const std::string &key, yamlMap<T> &vmap)
 {
     if ( node[key] ) {
         YAML::Node n = node[key];
-        return readMap(node, vmap);
+        return readMap(n, vmap);
     }
     return false;
 }
@@ -102,36 +130,36 @@ bool readSingleStruct(const YAML::Node &node, T &obj)
     return true;
 }
 template <typename T>
-bool readStruct(YAML::Node &node, const std::string &key, T &obj)
+bool readStruct(const YAML::Node &node, const std::string &key, T &obj)
 {
     if ( node[key] ) {
         YAML::Node n = node[key];
-        bool res = readSingleStruct(node, obj);
+        bool res = readSingleStruct(n, obj);
         if (res) {
             return true;
         }
     }
     return false;
 }
-template<> bool readStruct(YAML::Node &node, const std::string &key, yamlList<int> &obj)
+template<> bool readStruct(const YAML::Node &node, const std::string &key, yamlList<int> &obj)
 {
     return readValueList(node, key, obj);
 }
-template<> bool readStruct(YAML::Node &node, const std::string &key, yamlList<double> &obj)
+template<> bool readStruct(const YAML::Node &node, const std::string &key, yamlList<double> &obj)
 {
     return readValueList(node, key, obj);
 }
-template<> bool readStruct(YAML::Node &node, const std::string &key, yamlList<bool> &obj)
+template<> bool readStruct(const YAML::Node &node, const std::string &key, yamlList<bool> &obj)
 {
     return readValueList(node, key, obj);
 }
-template<> bool readStruct(YAML::Node &node, const std::string &key, yamlList<std::string> &obj)
+template<> bool readStruct(const YAML::Node &node, const std::string &key, yamlList<std::string> &obj)
 {
     return readValueList(node, key, obj);
 }
 
 template <typename T>
-bool readStructList(YAML::Node &node, const std::string &key, yamlList<T> &slist)
+bool readStructList(const YAML::Node &node, const std::string &key, yamlList<T> &slist)
 {
     if ( node[key] ) {
         YAML::Node n = node[key];
@@ -156,7 +184,7 @@ bool readStructList(YAML::Node &node, const std::string &key, yamlList<T> &slist
 }
 
 template <typename T>
-bool readStructMap(YAML::Node &node, const std::string &key, yamlMap<T> &smap)
+bool readStructMap(const YAML::Node &node, const std::string &key, yamlMap<T> &smap)
 {
     if ( node[key] ) {
         YAML::Node n = node[key];
