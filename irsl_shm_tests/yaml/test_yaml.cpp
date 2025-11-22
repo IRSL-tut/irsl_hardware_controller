@@ -2,13 +2,22 @@
 #include "irsl/simple_yaml_parser.hpp"
 #include <iostream>
 
-using namespace irsl_common_utils;
+namespace icu = irsl_common_utils;
 
 struct HOGE
 {
+    HOGE() : valueint(5678), valuedbl(-0.1234), valuestr("$default") {};
     int         valueint;
     double      valuedbl;
     std::string valuestr;
+};
+
+struct struct_b
+{
+    struct_b () : val_flt(-0.9876) {};
+    double val_flt;
+    icu::yamlList<int> val_list;
+    HOGE val_struct;
 };
 
 namespace YAML{
@@ -16,23 +25,35 @@ namespace YAML{
 template<>
 struct convert<HOGE> {
     static bool decode(const Node& node, HOGE& cType){
-        cType.valueint = node["valueint"].as<int>();
-        cType.valuedbl = node["valuedbl"].as<double>();
-        cType.valuestr = node["valuestr"].as<std::string>();
+        bool r1, r2, r3;
+        r1 = icu::readValue(node, "valueint", cType.valueint);
+        r2 = icu::readValue(node, "valuedbl", cType.valuedbl);
+        r3 = icu::readValue(node, "valuestr", cType.valuestr);
         return true;
     }
 };
-
+template <>
+struct convert<struct_b>
+{
+    static inline bool decode(const Node &node, struct_b &cType)
+    {
+        bool r1, r2, r3;
+        r1 = icu::readValue(node, "val_flt",  cType.val_flt);
+        r2 = icu::readValueList(node, "val_list", cType.val_list);
+        r3 = icu::readStruct(node, "val_struct", cType.val_struct);
+        return true;
+    }
+};
 }
 
 int main(int argc, char **argv)
 {
-    YAML::Node n;
+    icu::Node n;
     const std::string fname = "test.yaml";
     try {
         // check fname
-        n = YAML::LoadFile(fname);
-    } catch (const std::exception&) {
+        n = icu::LoadFile(fname);
+    } catch (const std::exception& e) {
         std::cerr << "parameter file [" << fname << "] can not open" << std::endl;
         return -1;
     }
@@ -41,7 +62,7 @@ int main(int argc, char **argv)
     bool res;
     int i_val;
     //res = readValue<int>(n, "int", i_val);
-    res = readValue<int>(n, "int", i_val);
+    res = icu::readValue<int>(n, "int", i_val);
     if (res) {
         std::cerr << "int: " << i_val << std::endl;
     } else {
@@ -49,7 +70,7 @@ int main(int argc, char **argv)
     }
 
     double d_val;
-    res = readValue<double>(n, "double", d_val);
+    res = icu::readValue<double>(n, "double", d_val);
     if (res) {
         std::cerr << "double: " << d_val << std::endl;
     } else {
@@ -57,7 +78,7 @@ int main(int argc, char **argv)
     }
 
     bool b_val;
-    res = readValue<bool>(n, "bool", b_val);
+    res = icu::readValue<bool>(n, "bool", b_val);
     if (res) {
         std::cerr << "bool: " << b_val << std::endl;
     } else {
@@ -65,7 +86,7 @@ int main(int argc, char **argv)
     }
 
     std::string s_val;
-    res = readValue<std::string>(n, "string", s_val);
+    res = icu::readValue<std::string>(n, "string", s_val);
     if (res) {
         std::cerr << "string: " << s_val << std::endl;
     } else {
@@ -73,7 +94,7 @@ int main(int argc, char **argv)
     }
 
     HOGE h_val;
-    res = readValue<HOGE>(n, "hoge", h_val);
+    res = icu::readValue<HOGE>(n, "hoge", h_val);
     if (res) {
         std::cerr << "hoge: " << std::endl;
         std::cerr << "  valueint: " << h_val.valueint << std::endl;
@@ -84,8 +105,8 @@ int main(int argc, char **argv)
     }
 
     //// read list(single type)
-    yamlList<int> i_lst;
-    res = readValueList<int>(n, "listint", i_lst);
+    icu::yamlList<int> i_lst;
+    res = icu::readValueList<int>(n, "listint", i_lst);
     if (res) {
         std::cerr << "listint: " << i_lst.size() << std::endl;
         for(int i = 0; i < i_lst.size(); i ++) {
@@ -94,8 +115,8 @@ int main(int argc, char **argv)
     } else {
         std::cerr << "fail :listint:" << std::endl;
     }
-    yamlList<double> d_lst;
-    res = readValueList<double>(n, "listdouble", d_lst);
+    icu::yamlList<double> d_lst;
+    res = icu::readValueList<double>(n, "listdouble", d_lst);
     if (res) {
         std::cerr << "listdouble: " << d_lst.size() << std::endl;
         for(int i = 0; i < i_lst.size(); i ++) {
@@ -104,8 +125,8 @@ int main(int argc, char **argv)
     } else {
         std::cerr << "fail :listdouble:" << std::endl;
     }
-    yamlList<std::string> s_lst;
-    res = readValueList<std::string>(n, "liststring", s_lst);
+    icu::yamlList<std::string> s_lst;
+    res = icu::readValueList<std::string>(n, "liststring", s_lst);
     if (res) {
         std::cerr << "liststring: " << s_lst.size() << std::endl;
         for(int i = 0; i < s_lst.size(); i ++) {
@@ -117,8 +138,8 @@ int main(int argc, char **argv)
 
 
     //// read map(key:string, value:single-type)
-    yamlMap<int> i_map;
-    res = readValueMap<int>(n, "mapint", i_map);
+    icu::yamlMap<int> i_map;
+    res = icu::readValueMap<int>(n, "mapint", i_map);
     if (res) {
         std::cerr << "mapint: " << i_map.size() << std::endl;
         for(auto it = i_map.begin(); it != i_map.end(); it++) {
@@ -128,8 +149,8 @@ int main(int argc, char **argv)
     } else {
         std::cerr << "fail :mapint:" << std::endl;
     }
-    yamlMap<double> d_map;
-    res = readValueMap<double>(n, "mapdouble", d_map);
+    icu::yamlMap<double> d_map;
+    res = icu::readValueMap<double>(n, "mapdouble", d_map);
     if (res) {
         std::cerr << "mapdouble: " << d_map.size() << std::endl;
         for(auto it = d_map.begin(); it != d_map.end(); it++) {
@@ -139,8 +160,8 @@ int main(int argc, char **argv)
     } else {
         std::cerr << "fail :mapdouble:" << std::endl;
     }
-    yamlMap<std::string> s_map;
-    res = readValueMap<std::string>(n, "mapstring", s_map);
+    icu::yamlMap<std::string> s_map;
+    res = icu::readValueMap<std::string>(n, "mapstring", s_map);
     if (res) {
         std::cerr << "mapstring: " << s_map.size() << std::endl;
         for(auto it = s_map.begin(); it != s_map.end(); it++) {
@@ -150,10 +171,17 @@ int main(int argc, char **argv)
     } else {
         std::cerr << "fail :mapstring:" << std::endl;
     }
-
     {
-        yamlList<HOGE> h_lst;
-        res=readStructList(n, "structlist", h_lst);
+        HOGE hoge;
+        res = icu::readStructList(n, "HOGE", hoge);
+        std::cerr << "HOGE: " << res << std::endl;
+        std::cerr << "  valueint: " << hoge.valueint << std::endl;
+        std::cerr << "  valuedbl: " << hoge.valuedbl << std::endl;
+        std::cerr << "  valuestr: " << hoge.valuestr << std::endl;
+    }
+    {
+        icu::yamlList<HOGE> h_lst;
+        res = icu::readStructList(n, "structlist", h_lst);
         if(res) {
             std::cerr << "structlist: " << h_lst.size() << std::endl;
             for(auto it = h_lst.begin(); it != h_lst.end(); ++it) {
@@ -167,16 +195,37 @@ int main(int argc, char **argv)
         }
     }
     {
-        yamlList<HOGE> h_lst;
-        res=readValueList(n, "structlist", h_lst);
-        if(res) {
-            std::cerr << "structlist: " << h_lst.size() << std::endl;
-            for(auto it = h_lst.begin(); it != h_lst.end(); ++it) {
-                std::cerr << "  hoge: " << std::endl;
-                std::cerr << "    valueint: " << (*it).valueint << std::endl;
-                std::cerr << "    valuedbl: " << (*it).valuedbl << std::endl;
-                std::cerr << "    valuestr: " << (*it).valuestr << std::endl;
+        struct_b str_b;
+        res = icu::readStruct(n, "struct_b", str_b);
+        if (res) {
+            std::cerr << "strut_b: " << std::endl;
+            std::cerr << "  val_flt: " << str_b.val_flt << std::endl;
+            std::cerr << "  val_list: " << std::endl;
+            for(int i = 0; i < str_b.val_list.size(); i ++) {
+                std::cerr << "    [" << i << "] : "<< str_b.val_list[i] << std::endl;
             }
+            std::cerr << "  val_struct: " << std::endl;
+            std::cerr << "    valueint: " << str_b.val_struct.valueint << std::endl;
+            std::cerr << "    valuedbl: " << str_b.val_struct.valuedbl << std::endl;
+            std::cerr << "    valuestr: " << str_b.val_struct.valuestr << std::endl;
+        } else {
+            std::cerr << "fail :structlist:" << std::endl;
+        }
+    }
+    {
+        struct_b str_b;
+        res = icu::readStruct(n, "struct_b_test", str_b);
+        if (res) {
+            std::cerr << "strut_b: " << std::endl;
+            std::cerr << "  val_flt: " << str_b.val_flt << std::endl;
+            std::cerr << "  val_list: " << std::endl;
+            for(int i = 0; i < str_b.val_list.size(); i ++) {
+                std::cerr << "    [" << i << "] : "<< str_b.val_list[i] << std::endl;
+            }
+            std::cerr << "  val_struct: " << std::endl;
+            std::cerr << "    valueint: " << str_b.val_struct.valueint << std::endl;
+            std::cerr << "    valuedbl: " << str_b.val_struct.valuedbl << std::endl;
+            std::cerr << "    valuestr: " << str_b.val_struct.valuestr << std::endl;
         } else {
             std::cerr << "fail :structlist:" << std::endl;
         }
