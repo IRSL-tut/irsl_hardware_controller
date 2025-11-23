@@ -49,12 +49,16 @@ struct convert<struct_b>
 int main(int argc, char **argv)
 {
     icu::Node n;
-    const std::string fname = "test.yaml";
+    std::string fname = "test.yaml";
+    if (argc > 1) {
+        fname = std::string(argv[1]);
+    }
     try {
         // check fname
         n = icu::LoadFile(fname);
     } catch (const std::exception& e) {
-        std::cerr << "parameter file [" << fname << "] can not open" << std::endl;
+        std::cerr << e.what() << std::endl;
+        std::cerr << "file: " << fname << " can not be opened" << std::endl;
         return -1;
     }
 
@@ -173,7 +177,7 @@ int main(int argc, char **argv)
     }
     {
         HOGE hoge;
-        res = icu::readStructList(n, "HOGE", hoge);
+        res = icu::readStruct(n, "HOGE", hoge);
         std::cerr << "HOGE: " << res << std::endl;
         std::cerr << "  valueint: " << hoge.valueint << std::endl;
         std::cerr << "  valuedbl: " << hoge.valuedbl << std::endl;
@@ -216,7 +220,7 @@ int main(int argc, char **argv)
         struct_b str_b;
         res = icu::readStruct(n, "struct_b_test", str_b);
         if (res) {
-            std::cerr << "strut_b: " << std::endl;
+            std::cerr << "strut_b_test: " << std::endl;
             std::cerr << "  val_flt: " << str_b.val_flt << std::endl;
             std::cerr << "  val_list: " << std::endl;
             for(int i = 0; i < str_b.val_list.size(); i ++) {
