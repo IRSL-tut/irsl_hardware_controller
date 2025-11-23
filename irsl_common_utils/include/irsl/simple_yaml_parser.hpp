@@ -7,6 +7,8 @@
 #include <vector>
 #include <unordered_map>
 
+#include "irsl/irsl_debug.h"
+
 namespace irsl_common_utils
 {
 
@@ -54,10 +56,12 @@ bool readValue(const YAML::Node &node, const std::string &key, T &value)
             T res = n.as<T>();
             value = res;
             return true;
-        } catch (const std::exception&) {
+        } catch (const std::exception &e) {
+            IRSL_ERROR_STREAM(e.what());
             return false;
         }
     }
+    IRSL_DEBUG_STREAM(" key: " << key << " not found");
     return false;
 }
 
@@ -71,12 +75,14 @@ bool readList(const YAML::Node &node, yamlList<T> &vlist)
             try {
                 T v = (*it).as<T>();
                 vlist.push_back(v);
-            } catch (const std::exception&) {
+            } catch (const std::exception &e) {
+                IRSL_ERROR_STREAM(e.what());
                 return false;
             }
         }
         return true;
     }
+    IRSL_ERROR_STREAM(" node is not sequence");
     return false;
 }
 
@@ -87,6 +93,7 @@ bool readValueList(const YAML::Node &node, const std::string &key, yamlList<T> &
         YAML::Node n = node[key];
         return readList<T>(n, vlist);
     }
+    IRSL_DEBUG_STREAM(" key: " << key << " not found");
     return false;
 }
 
@@ -100,11 +107,13 @@ bool readMap(const YAML::Node &node, yamlMap<T> &vmap)
                 T value = it->second.as<T>();
                 vmap.emplace(key, value);
             } catch (const std::exception &e) {
+                IRSL_ERROR_STREAM(e.what());
                 return false;
             }
         }
         return true;
     }
+    IRSL_ERROR_STREAM(" node is not map");
     return false;
 }
 
@@ -115,6 +124,7 @@ bool readValueMap(const YAML::Node &node, const std::string &key, yamlMap<T> &vm
         YAML::Node n = node[key];
         return readMap(n, vmap);
     }
+    IRSL_DEBUG_STREAM(" key: " << key << " not found");
     return false;
 }
 
@@ -124,7 +134,8 @@ bool readSingleStruct(const YAML::Node &node, T &obj)
 {
     try {
         obj = node.as<T>();
-    } catch (const std::exception&) {
+    } catch (const std::exception &e) {
+        IRSL_ERROR_STREAM(e.what());
         return false;
     }
     return true;
@@ -138,7 +149,10 @@ bool readStruct(const YAML::Node &node, const std::string &key, T &obj)
         if (res) {
             return true;
         }
+        IRSL_ERROR_STREAM(" struct read error");
+        return false;
     }
+    IRSL_DEBUG_STREAM(" key: " << key << " not found");
     return false;
 }
 template<> bool readStruct(const YAML::Node &node, const std::string &key, yamlList<int> &obj)
@@ -172,14 +186,17 @@ bool readStructList(const YAML::Node &node, const std::string &key, yamlList<T> 
                 if (res) {
                     slist.push_back(s);
                 } else {
+                    IRSL_ERROR_STREAM(" struct read error");
                     return false;
                 }
             }
             return true;
         } else {
+            IRSL_ERROR_STREAM(" node[" << key << "] is not sequence");
             return false;
         }
     }
+    IRSL_DEBUG_STREAM(" key: " << key << " not found");
     return false;
 }
 
@@ -196,13 +213,72 @@ bool readStructMap(const YAML::Node &node, const std::string &key, yamlMap<T> &s
                 if(res) {
                     smap.emplace(key, s);
                 } else {
+                    IRSL_ERROR_STREAM(" struct read error");
                     return false;
                 }
             }
             return true;
         } else {
+            IRSL_ERROR_STREAM(" node[" << key << "] is not map");
             return false;
         }
+    }
+    IRSL_DEBUG_STREAM("key: " << key << " not found");
+    return false;
+}
+
+template <typename T>
+bool parseConfig(const std::string &input, T &config_struct)
+{
+    Node n = Load(input);
+    if (n) {
+        return readSingleStruct<T>(n, config_struct);
+    }
+    return false;
+}
+template <typename T>
+bool parseConfig(std::istream &input, T &config_struct)
+{
+    Node n = Load(input);
+    if (n) {
+        return readSingleStruct<T>(n, config_struct);
+    }
+    return false;
+}
+template <typename T>
+bool LoadConfigFile(const std::string &filename, T &config_struct)
+{
+    Node n = LoadFile(filename);
+    if (n) {
+        return readSingleStruct<T>(n, config_struct);
+    }
+    return false;
+}
+//
+template <typename T>
+bool parseConfig(const std::string &input, const std::string &key, T &config_struct)
+{
+    Node n = Load(input);
+    if (n) {
+        return readStruct<T>(n, key, config_struct);
+    }
+    return false;
+}
+template <typename T>
+bool parseConfig(std::istream &input, const std::string &key, T &config_struct)
+{
+    Node n = Load(input);
+    if (n) {
+        return readStruct<T>(n, key, config_struct);
+    }
+    return false;
+}
+template <typename T>
+bool LoadConfigFile(const std::string &filename, const std::string &key, T &config_struct)
+{
+    Node n = LoadFile(filename);
+    if (n) {
+        return readStruct<T>(n, key, config_struct);
     }
     return false;
 }
