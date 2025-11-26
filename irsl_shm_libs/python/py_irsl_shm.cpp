@@ -62,6 +62,8 @@ PYBIND11_MODULE(irsl_shm, m)
         .def("calcTotalSize", &ShmSettings::calcTotalSize)
         .def("getSizeOfSingleJointData", &ShmSettings::getSizeOfSingleJointData)
         .def("equal", &ShmSettings::equal)
+        .def("setJointType", &ShmSettings::setJointType)
+        .def("setJointTypes", &ShmSettings::setJointTypes)
         // Offset helpers
         .def("getOffsetData", &ShmSettings::getOffsetData)
         .def("getOffsetStatus", &ShmSettings::getOffsetStatus)

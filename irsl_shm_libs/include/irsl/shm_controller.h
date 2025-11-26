@@ -73,6 +73,8 @@ struct ShmSettings {
     void setHeaderData(std::vector<uint8_t> &data);
     bool equal(const ShmSettings &settings);
 
+    bool setJointType(const std::string &type);
+    bool setJointTypes(const std::vector<std::string> &types);
     ////
     def_offset_method(Data);
     def_offset_method(Status);
@@ -188,7 +190,5 @@ void *open_shared_memory(const uint32_t _key, const uint64_t _size, int &shm_id,
 bool close_shared_memory(int shm_id);
 
 }
-
-#include "joint_types.hpp"
 
 #endif //__IRSL_SHM_CONTROLLER__

@@ -1,5 +1,5 @@
 #include "irsl/shm_controller.h"
-
+#include "irsl/joint_types.hpp"
 using namespace irsl_shm_controller;
 
 uint64_t ShmSettings::getSizeOfSingleJointData()
@@ -78,6 +78,25 @@ uint64_t ShmSettings::calcTotalSize()
     size += extraDataSize;
     totalSize = size;
     return size;
+}
+
+bool ShmSettings::setJointType(const std::string &type)
+{
+    ShmSettings::JointType res = getJointType(type);
+    if (res == ShmSettings::JointType::INVALID) {
+        return false;
+    }
+    jointType |= res;
+    return true;
+}
+
+bool ShmSettings::setJointTypes(const std::vector<std::string> &types)
+{
+    bool ret = true;
+    for(auto it = types.begin(); it != types.end(); it++) {
+        ret &= this->setJointType(*it);
+    }
+    return ret;
 }
 
 //// getOffset defined in ShmSettings/shm_controller.h
