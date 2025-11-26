@@ -27,6 +27,7 @@ struct ShmSettings {
 
     ////
     enum JointType { // 16bit
+        INVALID         = 0,
         PositionCommand = 1 << 0,
         PositionGains   = 1 << 1,
         VelocityCommand = 1 << 2,
@@ -187,5 +188,7 @@ void *open_shared_memory(const uint32_t _key, const uint64_t _size, int &shm_id,
 bool close_shared_memory(int shm_id);
 
 }
+
+#include "joint_types.hpp"
 
 #endif //__IRSL_SHM_CONTROLLER__
