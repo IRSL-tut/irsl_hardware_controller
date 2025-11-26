@@ -34,7 +34,7 @@ install(TARGETS ${targetname}
   LIBRARY       DESTINATION lib COMPONENT Runtime
   ARCHIVE       DESTINATION lib COMPONENT Development
   RUNTIME       DESTINATION bin COMPONENT Runtime
-  PUBLIC_HEADER DESTINATION include COMPONENT Development
+  # PUBLIC_HEADER DESTINATION include COMPONENT Development
   BUNDLE        DESTINATION bin COMPONENT Runtime
 )
 
@@ -43,5 +43,5 @@ install(EXPORT ${targetname}Targets
   NAMESPACE ${targetname}::
   DESTINATION lib/cmake/${targetname}
 )
-
+## header install (by copy)
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION include)
