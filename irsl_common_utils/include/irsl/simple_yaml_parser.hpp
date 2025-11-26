@@ -21,27 +21,27 @@ using yamlMap  = std::unordered_map<std::string, T>;
 typedef YAML::Node Node;
 
 //// loading parsing yaml
-Node Load(const std::string& input)
+inline Node Load(const std::string& input)
 {
     return YAML::Load(input);
 }
-Node Load(std::istream& input)
+inline Node Load(std::istream& input)
 {
     return YAML::Load(input);
 }
-Node LoadFile(const std::string& filename)
+inline Node LoadFile(const std::string& filename)
 {
     return YAML::LoadFile(filename);
 }
-std::vector<Node> LoadAll(const std::string& input)
+inline std::vector<Node> LoadAll(const std::string& input)
 {
     return YAML::LoadAll(input);
 }
-std::vector<Node> LoadAll(std::istream& input)
+inline std::vector<Node> LoadAll(std::istream& input)
 {
     return YAML::LoadAll(input);
 }
-std::vector<Node> LoadAllFromFile(const std::string& filename)
+inline std::vector<Node> LoadAllFromFile(const std::string& filename)
 {
     return YAML::LoadAllFromFile(filename);
 }
@@ -155,19 +155,19 @@ bool readStruct(const YAML::Node &node, const std::string &key, T &obj)
     IRSL_DEBUG_STREAM(" key: " << key << " not found");
     return false;
 }
-template<> bool readStruct(const YAML::Node &node, const std::string &key, yamlList<int> &obj)
+template<> inline bool readStruct(const YAML::Node &node, const std::string &key, yamlList<int> &obj)
 {
     return readValueList(node, key, obj);
 }
-template<> bool readStruct(const YAML::Node &node, const std::string &key, yamlList<double> &obj)
+template<> inline bool readStruct(const YAML::Node &node, const std::string &key, yamlList<double> &obj)
 {
     return readValueList(node, key, obj);
 }
-template<> bool readStruct(const YAML::Node &node, const std::string &key, yamlList<bool> &obj)
+template<> inline bool readStruct(const YAML::Node &node, const std::string &key, yamlList<bool> &obj)
 {
     return readValueList(node, key, obj);
 }
-template<> bool readStruct(const YAML::Node &node, const std::string &key, yamlList<std::string> &obj)
+template<> inline bool readStruct(const YAML::Node &node, const std::string &key, yamlList<std::string> &obj)
 {
     return readValueList(node, key, obj);
 }

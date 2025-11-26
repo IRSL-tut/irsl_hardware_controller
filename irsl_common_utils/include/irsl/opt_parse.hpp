@@ -1,9 +1,9 @@
 #pragma once
 
-#include "irsl/thirdparty/CLI11.hpp"
+#include "thirdparty/CLI11.hpp"
 #include <stdlib.h>
 
-namespace irsl_shm_controller
+namespace irsl_common_utils
 {
 
 class OptParse : public CLI::App

@@ -3,6 +3,8 @@
 #include <signal.h>
 #include <stdlib.h> // exit
 
+namespace {
+
 bool setSignalHandler(const int sig_type, sighandler_t handler)
 {
     sighandler_t res = signal(sig_type, handler);
@@ -12,3 +14,5 @@ bool setSignalHandler(const int sig_type, sighandler_t handler)
     }
     return true;
 }
+
+} // unnamed namespace
